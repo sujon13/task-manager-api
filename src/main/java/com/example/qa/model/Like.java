@@ -17,7 +17,7 @@ import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 @NoArgsConstructor
 @AllArgsConstructor
 @EntityListeners(AuditingEntityListener.class)
-public class Like {
+public class Like extends Auditable {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id")
@@ -28,6 +28,7 @@ public class Like {
     @Convert(converter = TypeConverter.class)
     private TypeEnum type;
 
+    @NotNull
     @Column(name = "parent_id")
     private Integer parentId;
 }

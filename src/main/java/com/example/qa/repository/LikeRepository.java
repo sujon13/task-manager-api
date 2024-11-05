@@ -12,4 +12,6 @@ public interface LikeRepository extends JpaRepository<Like, Integer> {
     List<Like> findAllByType(TypeEnum type);
 
     List<Like> findAllByParentId(Integer parentId);
+
+    boolean existsByParentIdAndCreatedBy(Integer parentId, String createdBy);
 }

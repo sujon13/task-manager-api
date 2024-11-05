@@ -1,5 +1,6 @@
 package com.example.qa.service;
 
+import com.example.qa.UserUtil;
 import com.example.qa.enums.TypeEnum;
 import com.example.qa.model.Like;
 import com.example.qa.model.LikeRequest;
@@ -18,6 +19,7 @@ import java.util.Optional;
 @Transactional(readOnly = true)
 public class LikeService {
     private final LikeRepository likeRepository;
+    private final UserUtil userUtil;
 
     private Like buildLike(LikeRequest request) {
         Like like = new Like();
@@ -43,5 +45,9 @@ public class LikeService {
 
     public List<Like> findByParentId(int parentId) {
         return likeRepository.findAllByParentId(parentId);
+    }
+
+    public boolean alreadyLikedByThisUserAndParent(LikeRequest request) {
+        return likeRepository.existsByParentIdAndCreatedBy(request.getParentId(), userUtil.getUserName());
     }
 }

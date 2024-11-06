@@ -34,10 +34,10 @@ public class Question extends Auditable  {
     @Column(name = "version", updatable = false)
     private Integer version = 1; // 1 for english
 
-    @Column(name = "question_en", length = 512)
+    @Column(name = "question_en", length = 1024)
     private String questionEn;
 
-    @Column(name = "question_bn", length = 512)
+    @Column(name = "question_bn", length = 1024)
     private String questionBn;
 
     @Column(name = "mcq_ans")

@@ -4,7 +4,6 @@ import com.example.qa.model.Like;
 import com.example.qa.model.LikeRequest;
 import com.example.qa.service.LikeService;
 import jakarta.validation.Valid;
-import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
@@ -24,7 +23,7 @@ public class LikeRestController {
     }
 
     @PostMapping("")
-    public ResponseEntity<Like> addLike(@RequestBody final LikeRequest likeRequest) {
+    public ResponseEntity<Like> addLike(@Valid @RequestBody final LikeRequest likeRequest) {
         if (likeService.alreadyLikedByThisUserAndParent(likeRequest)) {
             log.error("{} is already liked", likeRequest.getParentId());
             return new ResponseEntity<>(HttpStatus.CONFLICT);

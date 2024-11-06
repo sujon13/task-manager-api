@@ -39,6 +39,24 @@ public class LikeService {
         }
     }
 
+    private Optional<Like> checkAndAddLike(final LikeRequest likeRequest) {
+        if (this.alreadyLikedByThisUserAndParent(likeRequest)) {
+            log.error("{} is already liked", likeRequest.getParentId());
+            return Optional.empty();
+        }
+
+        return Optional.of(createLike(likeRequest));
+    }
+
+    @Transactional
+    public Optional<Like> createLike(TypeEnum type, int parentId) {
+        LikeRequest request = LikeRequest.builder()
+                .type(type.getValue())
+                .parentId(parentId)
+                .build();
+        return checkAndAddLike(request);
+    }
+
     public Optional<Like> findById(int id) {
         return likeRepository.findById(id);
     }

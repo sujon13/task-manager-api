@@ -6,7 +6,6 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-import org.springframework.data.annotation.CreatedBy;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 @Setter
@@ -27,8 +26,8 @@ public class Question extends Auditable  {
     private Integer type = 1; // 1 for mcq
 
     @NotNull
-    @Column(name = "questioner_id")
-    private Integer questionerId;
+    @Column(name = "questioner_user_name")
+    private String questionerUserName;
 
     @NotNull
     @Column(name = "version", updatable = false)

@@ -1,14 +1,17 @@
 package com.example.qa.service;
 
+import com.example.qa.enums.TypeEnum;
 import com.example.qa.model.Comment;
 import com.example.qa.model.CommentRequest;
+import com.example.qa.model.Like;
 import com.example.qa.repository.CommentRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.List;
 import java.util.Optional;
 
 @Service
@@ -17,6 +20,7 @@ import java.util.Optional;
 @Transactional(readOnly = true)
 public class CommentService {
     private final CommentRepository commentRepository;
+    private final LikeService likeService;
 
     private Comment buildComment(CommentRequest request) {
         Comment comment = new Comment();
@@ -40,8 +44,8 @@ public class CommentService {
         return commentRepository.findById(id);
     }
 
-    public List<Comment> findByQuestionId(int questionId) {
-        return commentRepository.findAllByQuestionId(questionId);
+    public Page<Comment> findByQuestionId(int questionId, Pageable pageable) {
+        return commentRepository.findAllByQuestionId(questionId, pageable);
     }
 
     @Transactional
@@ -68,14 +72,24 @@ public class CommentService {
         return optionalComment.get();
     }
 
-    @Transactional
-    public Comment incrementLikeCount(int id) {
+    private Comment incrementLikeCount(int id) {
         return editLikeCount(id, true);
     }
 
     @Transactional
     public Comment decrementLikeCount(int id) {
         return editLikeCount(id, false);
+    }
+
+    @Transactional
+    public Optional<Comment> likeComment(int id) {
+
+        Optional<Like> optionalLike = likeService.createLike(TypeEnum.Comment, id);
+        if (optionalLike.isEmpty()) {
+            return Optional.empty();
+        }
+
+        return Optional.of(incrementLikeCount(id));
     }
 
     @Transactional

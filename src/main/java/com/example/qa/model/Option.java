@@ -26,7 +26,7 @@ public class Option extends Auditable {
     private Integer questionId;
 
     @Column(name = "serial")
-    private String serial;
+    private Integer serial;
 
     @Column(name = "value_en")
     private String valueEn;

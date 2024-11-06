@@ -19,5 +19,5 @@ public class QuestionEditRequest {
     private Integer mcqAns;
     private Boolean visible;
 
-    private List<OptionRequest> optionsRequests = new ArrayList<>();
+    private List<OptionRequest> optionRequests = new ArrayList<>();
 }

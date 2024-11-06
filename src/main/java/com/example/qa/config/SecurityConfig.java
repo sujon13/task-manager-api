@@ -31,7 +31,11 @@ public class SecurityConfig {
                         .requestMatchers("/hello", "/secure", "/authenticate").permitAll() // Public endpoints
                         //.requestMatchers( "/password", "/api/v1/signup/", "/error").permitAll() // Public endpoints
                         .requestMatchers(HttpMethod.POST, PREFIX + "/likes").hasAnyRole("USER")
-                        .requestMatchers(PREFIX + "/comments").hasAnyRole("USER")
+                        .requestMatchers(PREFIX + "/comments", PREFIX + "/comments/**").hasAnyRole("USER")
+                        .requestMatchers(HttpMethod.POST, PREFIX + "/questions").hasAnyRole("QUESTIONER")
+                        .requestMatchers(HttpMethod.GET, PREFIX + "/questions/**").permitAll()
+                        .requestMatchers(HttpMethod.PATCH, PREFIX + "/questions/**").hasAnyRole("USER")
+                        .requestMatchers(HttpMethod.PUT, PREFIX + "/questions/**").hasAnyRole("QUESTIONER", "ADMIN")
                         .anyRequest().authenticated()  // Secure other endpoints
                 )
                 .sessionManagement(configurer -> configurer.sessionCreationPolicy(SessionCreationPolicy.STATELESS));

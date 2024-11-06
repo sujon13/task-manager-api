@@ -1,8 +1,9 @@
 package com.example.qa.service;
 
-import com.example.qa.model.Question;
-import com.example.qa.model.QuestionEditRequest;
-import com.example.qa.model.QuestionRequest;
+import com.example.qa.UserUtil;
+import com.example.qa.enums.TypeEnum;
+import com.example.qa.exception.NotFoundException;
+import com.example.qa.model.*;
 import com.example.qa.repository.QuestionRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -19,12 +20,14 @@ import java.util.Optional;
 public class QuestionService {
     private final QuestionRepository questionRepository;
     private final OptionService optionService;
+    private final LikeService likeService;
+    private final UserUtil userUtil;
 
 
     private Question buildQuestion(QuestionRequest request) {
         Question question = new Question();
         question.setType(request.getType());
-        question.setQuestionerId(1); //  need to update
+        question.setQuestionerUserName(userUtil.getUserName()); //  need to update
         question.setVersion(request.getVersion());
         question.setQuestionEn(request.getQuestionEn());
         question.setQuestionBn(request.getQuestionBn());
@@ -38,11 +41,25 @@ public class QuestionService {
         Question question = buildQuestion(request);
         try {
             questionRepository.save(question);
-            optionService.createOptions(request.getOptionsRequests(), question.getId());
+            List<OptionRequest> optionRequestList =
+                    optionService.createOptions(request.getOptionRequests(), question.getId());
             return question;
         } catch (RuntimeException e) {
             throw new RuntimeException(e);
         }
+    }
+
+    private QuestionEditRequest buildQuestionEditRequest(Question question, List<OptionRequest> optionRequestList) {
+        return QuestionEditRequest.builder()
+                .id(question.getId())
+                .questionEn(question.getQuestionEn())
+                .questionBn(question.getQuestionBn())
+                .type(question.getType())
+                .version(question.getVersion())
+                .visible(question.isVisible())
+                .mcqAns(question.getMcqAns())
+                .optionRequests(optionRequestList)
+                .build();
     }
 
     public Optional<Question> findById(int id) {
@@ -68,22 +85,44 @@ public class QuestionService {
             question.setVisible(request.getVisible());
     }
 
+    private Question editQuestionAndOption(Question question, QuestionEditRequest request) {
+        optionService.editOptions(request.getOptionRequests(), question.getId());
+        editQuestion(question, request);
+        return question;
+    }
+
     @Transactional
     public Question editQuestion(int id, QuestionEditRequest request) {
         Optional<Question> optionalQuestion = questionRepository.findById(id);
         if (optionalQuestion.isEmpty()) {
-            throw new RuntimeException("question not found");
+            throw new NotFoundException("question not found with id " + id);
         }
 
-        Question question = optionalQuestion.get();
-        optionService.editOptions(request.getOptionsRequests(), question.getId());
-        editQuestion(question, request);
-        return question;
+        return editQuestionAndOption(optionalQuestion.get(), request);
     }
 
     @Transactional
     public void deleteQuestion(int id) {
         optionService.deleteByQuestionId(id);
         questionRepository.deleteById(id);
+    }
+
+    private Question incrementLikeCount(int id) {
+        Optional<Question> optionalComment = findById(id);
+        if (optionalComment.isEmpty()) {
+            throw new NotFoundException("Comment not found with id + " + id);
+        }
+
+        optionalComment.get().setLikeCount(optionalComment.get().getLikeCount() + 1);
+        return optionalComment.get();
+    }
+
+    @Transactional
+    public Optional<Question> likeQuestion(int id) {
+        Optional<Like> optionalLike = likeService.createLike(TypeEnum.Question, id);
+        if (optionalLike.isEmpty()) {
+            return Optional.empty();
+        }
+        return Optional.of(incrementLikeCount(id));
     }
 }

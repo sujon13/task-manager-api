@@ -31,22 +31,31 @@ public class OptionService {
     }
 
     @Transactional
-    public Option createOption(OptionRequest request) {
+    public OptionRequest createOption(OptionRequest request) {
         Option option = buildOption(request);
         try {
             optionRepository.save(option);
-            return option;
+            return createOptionRequest(option);
         } catch (RuntimeException e) {
             throw new RuntimeException(e);
         }
     }
 
     @Transactional
-    public List<Option> createOptions(List<OptionRequest> requests, int questionId) {
+    public List<OptionRequest> createOptions(List<OptionRequest> requests, int questionId) {
         return requests.stream()
                 .peek(request -> request.setQuestionId(questionId))
                 .map(this::createOption)
                 .toList();
+    }
+
+    private OptionRequest createOptionRequest(Option option) {
+        return OptionRequest.builder()
+                .id(option.getId())
+                .serial(option.getSerial())
+                .valueEn(option.getValueEn())
+                .valueBn(option.getValueBn())
+                .build();
     }
 
     public Optional<Option> findById(int id) {

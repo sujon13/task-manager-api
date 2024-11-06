@@ -18,6 +18,7 @@ management:
 
 logging:
   level:
+    com.example.qa: DEBUG
     org.springframework.security: DEBUG
     org.springframework.jdbc.datasource: INFO
     com.zaxxer.hikari: INFO  # For HikariCP

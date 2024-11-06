@@ -11,7 +11,9 @@ import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 @Setter
 @Getter
 @Entity
-@Table(name = "comments")
+@Table(name = "comments", indexes = {
+        @Index(name = "idx_comments_question_id", columnList = "question_id")
+})
 @NoArgsConstructor
 @AllArgsConstructor
 @EntityListeners(AuditingEntityListener.class)

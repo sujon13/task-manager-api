@@ -1,6 +1,8 @@
 package com.example.qa.service;
 
 import com.example.qa.UserUtil;
+import com.example.qa.enums.QuesTypeEnum;
+import com.example.qa.enums.QuestionVersion;
 import com.example.qa.enums.TypeEnum;
 import com.example.qa.exception.NotFoundException;
 import com.example.qa.model.*;
@@ -26,9 +28,9 @@ public class QuestionService {
 
     private Question buildQuestion(QuestionRequest request) {
         Question question = new Question();
-        question.setType(request.getType());
+        question.setType(QuesTypeEnum.getByValue(request.getType()));
         question.setQuestionerUserName(userUtil.getUserName()); //  need to update
-        question.setVersion(request.getVersion());
+        question.setVersion(QuestionVersion.getByValue(request.getVersion()));
         question.setQuestionEn(request.getQuestionEn());
         question.setQuestionBn(request.getQuestionBn());
         question.setMcqAns(request.getMcqAns()); // 1 (a) 2 (b) (1-5)
@@ -49,19 +51,6 @@ public class QuestionService {
         }
     }
 
-    private QuestionEditRequest buildQuestionEditRequest(Question question, List<OptionRequest> optionRequestList) {
-        return QuestionEditRequest.builder()
-                .id(question.getId())
-                .questionEn(question.getQuestionEn())
-                .questionBn(question.getQuestionBn())
-                .type(question.getType())
-                .version(question.getVersion())
-                .visible(question.isVisible())
-                .mcqAns(question.getMcqAns())
-                .optionRequests(optionRequestList)
-                .build();
-    }
-
     public Optional<Question> findById(int id) {
         return questionRepository.findById(id);
     }
@@ -72,9 +61,9 @@ public class QuestionService {
 
     private void editQuestion(Question question, QuestionEditRequest request) {
         if (request.getType() != null)
-            question.setType(request.getType());
+            question.setType(QuesTypeEnum.getByValue(request.getType()));
         if (request.getVersion() != null)
-            question.setVersion(request.getVersion());
+            question.setVersion(QuestionVersion.getByValue(request.getVersion()));
         if (request.getQuestionEn() != null)
             question.setQuestionEn(request.getQuestionEn());
         if (request.getQuestionBn() != null)

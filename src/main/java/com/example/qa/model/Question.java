@@ -1,5 +1,9 @@
 package com.example.qa.model;
 
+import com.example.qa.converter.QuesTypeConverter;
+import com.example.qa.converter.QuesVersionConverter;
+import com.example.qa.enums.QuesTypeEnum;
+import com.example.qa.enums.QuestionVersion;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
@@ -23,7 +27,8 @@ public class Question extends Auditable  {
 
     @NotNull
     @Column(name = "type", updatable = false)
-    private Integer type = 1; // 1 for mcq
+    @Convert(converter = QuesTypeConverter.class)
+    private QuesTypeEnum type = QuesTypeEnum.Mcq;
 
     @NotNull
     @Column(name = "questioner_user_name")
@@ -31,7 +36,8 @@ public class Question extends Auditable  {
 
     @NotNull
     @Column(name = "version", updatable = false)
-    private Integer version = 1; // 1 for english
+    @Convert(converter = QuesVersionConverter.class)
+    private QuestionVersion version = QuestionVersion.English;
 
     @Column(name = "question_en", length = 1024)
     private String questionEn;

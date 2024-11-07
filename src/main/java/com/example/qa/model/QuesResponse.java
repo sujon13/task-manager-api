@@ -7,29 +7,28 @@ import lombok.*;
 import java.util.ArrayList;
 import java.util.List;
 
-
 @Getter
 @Setter
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class QuestionRequest {
+public class QuesResponse extends Auditable {
+    private Integer id;
     private Integer parentId;
-
     private Integer serial;
-
-    @Builder.Default
-    private QuesTypeEnum QuesType = QuesTypeEnum.MCQ;
-    @Builder.Default
-    private QuestionVersion version = QuestionVersion.ENGLISH;
-
+    private QuesTypeEnum quesType;
+    private String questionerUserName;
+    private QuestionVersion version;
     private String questionEn;
     private String questionBn;
     private Integer mcqAns;
-    private boolean visible = true;
+    private boolean visible;
+    private Integer likeCount;
+    private Integer freqCount;
 
     @Builder.Default
-    private List<OptionRequest> optionRequests = new ArrayList<>();
+    private List<OptionResponse> optionResponses = new ArrayList<>();
+
     @Builder.Default
-    private List<QuestionRequest> subQuesRequests = new ArrayList<>();
+    private List<QuesResponse> subResponses = new ArrayList<>();
 }

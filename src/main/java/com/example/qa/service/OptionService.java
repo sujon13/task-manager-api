@@ -2,9 +2,11 @@ package com.example.qa.service;
 
 import com.example.qa.model.Option;
 import com.example.qa.model.OptionRequest;
+import com.example.qa.model.OptionResponse;
 import com.example.qa.repository.OptionRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.BeanUtils;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -62,8 +64,21 @@ public class OptionService {
         return optionRepository.findById(id);
     }
 
+    private OptionResponse createOptionResponse(Option option) {
+        OptionResponse optionResponse = new OptionResponse();
+        BeanUtils.copyProperties(option, optionResponse);
+        return optionResponse;
+    }
+
     public List<Option> findByQuestionId(int questionId) {
         return optionRepository.findAllByQuestionId(questionId);
+    }
+
+    public List<OptionResponse> getOptionResponsesByQuestionId(int questionId) {
+        List<Option> options = findByQuestionId(questionId);
+        return options.stream()
+                .map(this::createOptionResponse)
+                .toList();
     }
 
     @Transactional

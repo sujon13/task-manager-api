@@ -1,6 +1,5 @@
 package com.example.qa.model;
 
-import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.validation.constraints.NotNull;
 import lombok.*;
 
@@ -16,6 +15,5 @@ public class LikeRequest {
     private Integer type;
 
     @NotNull
-    @JsonProperty("parent_id")
     private Integer parentId;
 }

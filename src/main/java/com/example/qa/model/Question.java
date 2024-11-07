@@ -19,16 +19,22 @@ import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 @NoArgsConstructor
 @AllArgsConstructor
 @EntityListeners(AuditingEntityListener.class)
-public class Question extends Auditable  {
+public class Question extends Auditable {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id")
     private Integer id;
 
+    @Column(name = "parent_id")
+    private Integer parentId;
+
+    @Column(name = "serial")
+    private Integer serial;
+
     @NotNull
-    @Column(name = "type", updatable = false)
+    @Column(name = "ques_type", updatable = false)
     @Convert(converter = QuesTypeConverter.class)
-    private QuesTypeEnum type = QuesTypeEnum.Mcq;
+    private QuesTypeEnum quesType = QuesTypeEnum.MCQ;
 
     @NotNull
     @Column(name = "questioner_user_name")
@@ -37,7 +43,7 @@ public class Question extends Auditable  {
     @NotNull
     @Column(name = "version", updatable = false)
     @Convert(converter = QuesVersionConverter.class)
-    private QuestionVersion version = QuestionVersion.English;
+    private QuestionVersion version = QuestionVersion.ENGLISH;
 
     @Column(name = "question_en", length = 1024)
     private String questionEn;

@@ -2,13 +2,13 @@ package com.example.qa.service;
 
 import com.example.qa.UserUtil;
 import com.example.qa.enums.QuesTypeEnum;
-import com.example.qa.enums.QuestionVersion;
 import com.example.qa.enums.TypeEnum;
 import com.example.qa.exception.NotFoundException;
 import com.example.qa.model.*;
 import com.example.qa.repository.QuestionRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.BeanUtils;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -28,9 +28,11 @@ public class QuestionService {
 
     private Question buildQuestion(QuestionRequest request) {
         Question question = new Question();
-        question.setType(QuesTypeEnum.getByValue(request.getType()));
+        question.setParentId(request.getParentId());
+        question.setSerial(request.getSerial());
+        question.setQuesType(request.getQuesType());
         question.setQuestionerUserName(userUtil.getUserName()); //  need to update
-        question.setVersion(QuestionVersion.getByValue(request.getVersion()));
+        question.setVersion(request.getVersion());
         question.setQuestionEn(request.getQuestionEn());
         question.setQuestionBn(request.getQuestionBn());
         question.setMcqAns(request.getMcqAns()); // 1 (a) 2 (b) (1-5)
@@ -38,13 +40,24 @@ public class QuestionService {
         return question;
     }
 
+    private void createSubQuestions(Integer parentId, List<QuestionRequest> subQuestionRequests) {
+        subQuestionRequests
+                .forEach(subQuesRequest -> {
+                    subQuesRequest.setParentId(parentId);
+                    creteQuestion(subQuesRequest);
+                });
+    }
+
     @Transactional
     public Question creteQuestion(QuestionRequest request) {
         Question question = buildQuestion(request);
         try {
             questionRepository.save(question);
-            List<OptionRequest> optionRequestList =
-                    optionService.createOptions(request.getOptionRequests(), question.getId());
+            if (QuesTypeEnum.MCQ.equals(request.getQuesType())) {
+                optionService.createOptions(request.getOptionRequests(), question.getId());
+            } else {
+                createSubQuestions(question.getId(), request.getSubQuesRequests());
+            }
             return question;
         } catch (RuntimeException e) {
             throw new RuntimeException(e);
@@ -55,15 +68,39 @@ public class QuestionService {
         return questionRepository.findById(id);
     }
 
-    public List<Question> findAllById(List<Integer> ids) {
-        return questionRepository.findAllById(ids);
+    private QuesResponse createResponse(Question question) {
+        QuesResponse quesResponse = new QuesResponse();
+        BeanUtils.copyProperties(question, quesResponse);
+
+        if (QuesTypeEnum.MCQ.equals(question.getQuesType())) {
+            quesResponse.setOptionResponses(optionService.getOptionResponsesByQuestionId(quesResponse.getId()));
+        } else {
+            List<QuesResponse> subQuesResponses = questionRepository.findAllByParentId(question.getId())
+                    .stream()
+                    .map(this::createResponse)
+                    .toList();
+            quesResponse.setSubResponses(subQuesResponses);
+        }
+        return quesResponse;
     }
 
-    private void editQuestion(Question question, QuestionEditRequest request) {
-        if (request.getType() != null)
-            question.setType(QuesTypeEnum.getByValue(request.getType()));
+    public QuesResponse getQuesResponseById(int id) {
+        Optional<Question> optionalQuestion = questionRepository.findById(id);
+        if (optionalQuestion.isEmpty()) {
+            throw new NotFoundException("Question not found with id " + id);
+        }
+        Question question = optionalQuestion.get();
+
+        return createResponse(question);
+    }
+
+    private Question editQuestion(Question question, QuestionEditRequest request) {
+        if (request.getParentId() != null)
+            question.setParentId(request.getParentId());
+        if (request.getSerial() != null)
+            question.setSerial(request.getSerial());
         if (request.getVersion() != null)
-            question.setVersion(QuestionVersion.getByValue(request.getVersion()));
+            question.setVersion(request.getVersion());
         if (request.getQuestionEn() != null)
             question.setQuestionEn(request.getQuestionEn());
         if (request.getQuestionBn() != null)
@@ -72,11 +109,6 @@ public class QuestionService {
             question.setMcqAns(request.getMcqAns());
         if (request.getVisible() != null)
             question.setVisible(request.getVisible());
-    }
-
-    private Question editQuestionAndOption(Question question, QuestionEditRequest request) {
-        optionService.editOptions(request.getOptionRequests(), question.getId());
-        editQuestion(question, request);
         return question;
     }
 
@@ -87,7 +119,16 @@ public class QuestionService {
             throw new NotFoundException("question not found with id " + id);
         }
 
-        return editQuestionAndOption(optionalQuestion.get(), request);
+        Question question = optionalQuestion.get();
+
+        if (QuesTypeEnum.MCQ.equals(question.getQuesType())) {
+            optionService.editOptions(request.getOptionRequests(), question.getId());
+        } else {
+            request.getSubQuesRequests()
+                    .forEach(subQuesRequest -> editQuestion(subQuesRequest.getId(), subQuesRequest));
+        }
+
+        return editQuestion(question, request);
     }
 
     @Transactional
@@ -108,7 +149,7 @@ public class QuestionService {
 
     @Transactional
     public Optional<Question> likeQuestion(int id) {
-        Optional<Like> optionalLike = likeService.createLike(TypeEnum.Question, id);
+        Optional<Like> optionalLike = likeService.createLike(TypeEnum.QUESTION, id);
         if (optionalLike.isEmpty()) {
             return Optional.empty();
         }

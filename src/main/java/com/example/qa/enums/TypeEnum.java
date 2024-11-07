@@ -1,12 +1,15 @@
 package com.example.qa.enums;
 
+import lombok.Getter;
+
 import java.util.Map;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+@Getter
 public enum TypeEnum {
-    Question(0),
-    Comment(1);
+    QUESTION(0),
+    COMMENT(1);
 
     private static final Map<Integer, TypeEnum> mapByValue;
 
@@ -19,10 +22,6 @@ public enum TypeEnum {
 
     TypeEnum(int value) {
         this.value = value;
-    }
-
-    public int getValue() {
-        return value;
     }
 
     public static TypeEnum getByValue(Integer value) {

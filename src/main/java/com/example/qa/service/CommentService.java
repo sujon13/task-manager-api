@@ -84,7 +84,7 @@ public class CommentService {
     @Transactional
     public Optional<Comment> likeComment(int id) {
 
-        Optional<Like> optionalLike = likeService.createLike(TypeEnum.Comment, id);
+        Optional<Like> optionalLike = likeService.createLike(TypeEnum.COMMENT, id);
         if (optionalLike.isEmpty()) {
             return Optional.empty();
         }

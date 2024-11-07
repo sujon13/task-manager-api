@@ -8,8 +8,8 @@ import java.util.stream.Stream;
 
 @Getter
 public enum QuestionVersion {
-    English(0),
-    Version(1);
+    ENGLISH(0),
+    VERSION(1);
 
     private static final Map<Integer, QuestionVersion> mapByValue;
 

@@ -1,5 +1,6 @@
 package com.example.qa.controller;
 
+import com.example.qa.model.QuesResponse;
 import com.example.qa.model.Question;
 import com.example.qa.model.QuestionEditRequest;
 import com.example.qa.model.QuestionRequest;
@@ -24,10 +25,8 @@ public class QuesRestController {
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<Question> getQuestionById(@PathVariable final int id) {
-        return questionService.findById(id)
-                .map(ResponseEntity::ok)
-                .orElse(ResponseEntity.notFound().build());
+    public QuesResponse getQuesResponseById(@PathVariable final int id) {
+        return questionService.getQuesResponseById(id);
     }
 
     @PutMapping("/{id}")

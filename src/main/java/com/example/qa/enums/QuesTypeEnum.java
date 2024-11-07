@@ -8,9 +8,9 @@ import java.util.stream.Stream;
 
 @Getter
 public enum QuesTypeEnum {
-    Mcq(0),
-    Written(1),
-    SubQuestion(2);
+    MCQ(0),
+    WRITTEN(1),
+    SUB_QUESTION(2);
 
     private static final Map<Integer, QuesTypeEnum> mapByValue;
 

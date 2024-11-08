@@ -1,9 +1,9 @@
 package com.example.qa.service;
 
-import com.example.qa.UserUtil;
+import com.example.UserUtil;
+import com.example.exception.NotFoundException;
 import com.example.qa.enums.QuesTypeEnum;
 import com.example.qa.enums.TypeEnum;
-import com.example.qa.exception.NotFoundException;
 import com.example.qa.model.*;
 import com.example.qa.repository.QuestionRepository;
 import lombok.RequiredArgsConstructor;
@@ -92,6 +92,13 @@ public class QuestionService {
         Question question = optionalQuestion.get();
 
         return createResponse(question);
+    }
+
+    public List<QuesResponse> getQuesResponsesByIds(List<Integer> ids) {
+        return questionRepository.findAllById(ids)
+                .stream()
+                .map(this::createResponse)
+                .toList();
     }
 
     private Question editQuestion(Question question, QuestionEditRequest request) {

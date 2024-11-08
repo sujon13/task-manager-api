@@ -1,6 +1,6 @@
 package com.example.qa.service;
 
-import com.example.qa.UserUtil;
+import com.example.UserUtil;
 import com.example.qa.enums.TypeEnum;
 import com.example.qa.model.Like;
 import com.example.qa.model.LikeRequest;

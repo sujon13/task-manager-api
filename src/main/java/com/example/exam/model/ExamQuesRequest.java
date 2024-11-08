@@ -1,4 +1,4 @@
-package com.example.qa.model;
+package com.example.exam.model;
 
 import jakarta.validation.constraints.NotNull;
 import lombok.*;
@@ -17,4 +17,9 @@ public class ExamQuesRequest {
 
     @NotNull
     private Integer examId;
+
+    @Builder.Default
+    private Integer marks = 1;
+
+    private Integer ans;
 }

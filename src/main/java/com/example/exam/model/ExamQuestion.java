@@ -1,5 +1,6 @@
-package com.example.qa.model;
+package com.example.exam.model;
 
+import com.example.qa.model.Auditable;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
@@ -28,4 +29,10 @@ public class ExamQuestion extends Auditable {
     @NotNull
     @Column(name = "exam_id")
     private Integer examId;
+
+    @Column(name = "marks")
+    private int marks = 1;
+
+    @Column(name = "ans")
+    private Integer ans;
 }

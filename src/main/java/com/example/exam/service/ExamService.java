@@ -1,5 +1,6 @@
 package com.example.exam.service;
 
+import com.example.UserUtil;
 import com.example.exam.model.Exam;
 import com.example.exam.model.ExamEditRequest;
 import com.example.exam.model.ExamRequest;
@@ -9,6 +10,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -22,6 +24,7 @@ import java.util.Optional;
 public class ExamService {
     private final ExamRepository examRepository;
     private final ExamValidationService examValidationService;
+    private final UserUtil userUtil;
 
     private Exam buildExam(ExamRequest request) {
         Exam exam = new Exam();
@@ -88,6 +91,9 @@ public class ExamService {
     @Transactional
     public Exam updateExam(final int id, ExamEditRequest request) {
         Exam exam = getExam(id);
+        if (!userUtil.hasEditPermission(exam)) {
+            throw new AccessDeniedException("You do not have permission to edit this exam");
+        }
         editExam(exam, request);
         return exam;
     }
@@ -97,10 +103,8 @@ public class ExamService {
     }
 
     public Exam getExam(int id) {
-        Optional<Exam> optionalExam = examRepository.findById(id);
-        if (optionalExam.isEmpty())
-            throw new NotFoundException("Exam not found with id " + id);
-        return optionalExam.get();
+        return findById(id)
+                .orElseThrow(() ->  new NotFoundException("Exam not found with id " + id));
     }
 
     public Page<Exam> findExams(Pageable pageable) {

@@ -81,19 +81,6 @@ public class OptionService {
                 .toList();
     }
 
-    @Transactional
-    public Option editOption(OptionRequest request) {
-        Optional<Option> optionalOption = optionRepository.findById(request.getId());
-        if (optionalOption.isEmpty()) {
-            throw new RuntimeException("Option not found");
-        }
-
-        Option option = optionalOption.get();
-        editOption(request, option);
-
-        return option;
-    }
-
     private Option editOption(OptionRequest request, Option option) {
         if (request.getSerial() != null)
             option.setSerial(request.getSerial());

@@ -9,6 +9,7 @@ import com.example.qa.repository.QuestionRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.BeanUtils;
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -68,6 +69,11 @@ public class QuestionService {
         return questionRepository.findById(id);
     }
 
+    public Question getQuestion(int id) {
+        return findById(id)
+                .orElseThrow(() -> new NotFoundException("Question not found with id " + id));
+    }
+
     private QuesResponse createResponse(Question question) {
         QuesResponse quesResponse = new QuesResponse();
         BeanUtils.copyProperties(question, quesResponse);
@@ -85,12 +91,7 @@ public class QuestionService {
     }
 
     public QuesResponse getQuesResponseById(int id) {
-        Optional<Question> optionalQuestion = questionRepository.findById(id);
-        if (optionalQuestion.isEmpty()) {
-            throw new NotFoundException("Question not found with id " + id);
-        }
-        Question question = optionalQuestion.get();
-
+        Question question = getQuestion(id);
         return createResponse(question);
     }
 
@@ -121,12 +122,12 @@ public class QuestionService {
 
     @Transactional
     public Question editQuestion(int id, QuestionEditRequest request) {
-        Optional<Question> optionalQuestion = questionRepository.findById(id);
-        if (optionalQuestion.isEmpty()) {
-            throw new NotFoundException("question not found with id " + id);
+        Question question = getQuestion(id);
+
+        if (!userUtil.hasEditPermission(question)) {
+            throw new AccessDeniedException("You do not have permission to edit this question");
         }
 
-        Question question = optionalQuestion.get();
 
         if (QuesTypeEnum.MCQ.equals(question.getQuesType())) {
             optionService.editOptions(request.getOptionRequests(), question.getId());
@@ -145,13 +146,10 @@ public class QuestionService {
     }
 
     private Question incrementLikeCount(int id) {
-        Optional<Question> optionalComment = findById(id);
-        if (optionalComment.isEmpty()) {
-            throw new NotFoundException("Comment not found with id + " + id);
-        }
+        Question question = getQuestion(id);
 
-        optionalComment.get().setLikeCount(optionalComment.get().getLikeCount() + 1);
-        return optionalComment.get();
+        question.setLikeCount(question.getLikeCount() + 1);
+        return question;
     }
 
     @Transactional

@@ -11,6 +11,7 @@ import org.springframework.security.config.annotation.web.configuration.EnableWe
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.access.AccessDeniedHandler;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
 
@@ -21,6 +22,7 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 public class SecurityConfig {
     private static final String PREFIX = "/api/v1";
     private final JwtRequestFilter jwtRequestFilter;
+    private final AccessDeniedHandler accessDeniedHandler;
 
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
@@ -36,8 +38,18 @@ public class SecurityConfig {
                         .requestMatchers(HttpMethod.GET, PREFIX + "/questions/**").permitAll()
                         .requestMatchers(HttpMethod.PATCH, PREFIX + "/questions/**").hasAnyRole("USER")
                         .requestMatchers(HttpMethod.PUT, PREFIX + "/questions/**").hasAnyRole("QUESTIONER", "ADMIN")
+
+                        .requestMatchers(HttpMethod.POST, PREFIX + "/exams").hasAnyRole("EXAMINER", "ADMIN")
+                        .requestMatchers(HttpMethod.GET, PREFIX + "/exams").permitAll()
+                        .requestMatchers(HttpMethod.PUT, PREFIX + "/exams/**").hasAnyRole("EXAMINER", "ADMIN")
+
+                        .requestMatchers(HttpMethod.POST, PREFIX + "/exams/*/questions").hasAnyRole("EXAMINER", "ADMIN")
+                        .requestMatchers(HttpMethod.GET, PREFIX + "/exams/*/questions").permitAll()
+                        .requestMatchers(HttpMethod.PUT, PREFIX + "/exams/*/questions/**").hasAnyRole("EXAMINER", "ADMIN")
+
                         .anyRequest().authenticated()  // Secure other endpoints
                 )
+                .exceptionHandling(exceptions -> exceptions.accessDeniedHandler(accessDeniedHandler))
                 .sessionManagement(configurer -> configurer.sessionCreationPolicy(SessionCreationPolicy.STATELESS));
 
         http.addFilterBefore(jwtRequestFilter, UsernamePasswordAuthenticationFilter.class);  // Add JWT filter

@@ -1,5 +1,6 @@
 package com.example.exam.service;
 
+import com.example.UserUtil;
 import com.example.exam.model.*;
 import com.example.exam.repository.ExamQuesRepository;
 import com.example.exam.repository.ExamRepository;
@@ -10,6 +11,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -24,6 +26,7 @@ public class ExamQuesService {
     private final ExamQuesRepository examQuesRepository;
     private final ExamRepository examRepository;
     private final QuestionService questionService;
+    private final UserUtil userUtil;
 
     private ExamQuestion buildExamQuestion(ExamQuesRequest request) {
         ExamQuestion examQuestion = new ExamQuestion();
@@ -57,18 +60,25 @@ public class ExamQuesService {
 
     @Transactional
     public ExamQuestion updateExamQuestion(final int id, ExamQuesEditRequest request) {
-        Optional<ExamQuestion> examQuestion = examQuesRepository.findById(id);
-        if (examQuestion.isEmpty())
-            throw new NotFoundException("Exam question not found with id " + id);
-        ExamQuestion examQuestionToEdit = examQuestion.get();
+        ExamQuestion examQuestion = getExamQuestion(id);
 
-        editExamQuestion(examQuestionToEdit, request);
-        return examQuestionToEdit;
+        if (!userUtil.hasEditPermission(examQuestion)) {
+            throw new AccessDeniedException("You do not have permission to edit this exam question");
+        }
+
+        editExamQuestion(examQuestion, request);
+        return examQuestion;
     }
 
     public Optional<ExamQuestion> findById(int id) {
         return examQuesRepository.findById(id);
     }
+
+    public ExamQuestion getExamQuestion(int id) {
+        return findById(id)
+                .orElseThrow(() -> new NotFoundException("Exam question not found with id " + id));
+    }
+
 
     public Page<ExamQuestion> findAllByExamId(int examId, Pageable pageable) {
         return examQuesRepository.findAllByExamId(examId, pageable);

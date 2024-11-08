@@ -1,5 +1,6 @@
 package com.example.qa.service;
 
+import com.example.exception.NotFoundException;
 import com.example.qa.enums.TypeEnum;
 import com.example.qa.model.Comment;
 import com.example.qa.model.CommentRequest;
@@ -44,32 +45,19 @@ public class CommentService {
         return commentRepository.findById(id);
     }
 
+    public Comment getComment(int id) {
+        return findById(id)
+                .orElseThrow(() -> new NotFoundException("Comment not found with id + " + id));
+    }
+
     public Page<Comment> findByQuestionId(int questionId, Pageable pageable) {
         return commentRepository.findAllByQuestionId(questionId, pageable);
     }
 
-    @Transactional
-    public Comment editComment(CommentRequest request) {
-        Optional<Comment> optionalComment = findById(request.getId());
-        if (optionalComment.isEmpty()) {
-            throw new RuntimeException("Comment not found with id + " + request.getId());
-        }
-
-        Comment comment = optionalComment.get();
-        if (request.getDescription() != null)
-            comment.setDescription(request.getDescription());
-
-        return comment;
-    }
-
     private Comment editLikeCount(int id, boolean increment) {
-        Optional<Comment> optionalComment = findById(id);
-        if (optionalComment.isEmpty()) {
-            throw new RuntimeException("Comment not found with id + " + id);
-        }
-
-        optionalComment.get().setLikeCount(optionalComment.get().getLikeCount() + (increment ? 1 : -1));
-        return optionalComment.get();
+        Comment comment = getComment(id);
+        comment.setLikeCount(comment.getLikeCount() + (increment ? 1 : -1));
+        return comment;
     }
 
     private Comment incrementLikeCount(int id) {

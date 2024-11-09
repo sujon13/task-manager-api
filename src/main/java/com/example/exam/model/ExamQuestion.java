@@ -7,15 +7,15 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 @Setter
 @Getter
 @Entity
-@Table(name = "exam_questions")
+@Table(name = "exam_questions", indexes = {
+        @Index(name = "idx_exam_questions_exam_ques_id", columnList = "exam_id, question_id"),
+})
 @NoArgsConstructor
 @AllArgsConstructor
-@EntityListeners(AuditingEntityListener.class)
 public class ExamQuestion extends Auditable {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

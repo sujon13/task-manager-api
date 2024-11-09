@@ -29,6 +29,7 @@ public class PracticeExamService {
     private final UserUtil userUtil;
     private final ExamService examService;
     private final ExamQuesService examQuesService;
+    private final SubmissionService submissionService;
 
     private void setExamStatus(PracticeExam exam) {
         if (exam.getStartTime() == null)
@@ -166,19 +167,36 @@ public class PracticeExamService {
         return practiceExamRepository.findAllByStatus(ExamStatus.RUNNING);
     }
 
-    private void updateMarkAndPosition(PracticeExam practiceExam) {
+    private double calculateMarks(int correct, int wrong) {
+        return correct - (wrong * 2);
+    }
 
+    private void updateMarkAndPosition(PracticeExam practiceExam) {
+        SubmissionStatistics statistics =
+                submissionService.getStatistics(practiceExam.getId(), practiceExam.getExamineeUserName());
+        statistics.setNotAnswered(practiceExam.getTotalQuestions() - statistics.getAnswered());
+        practiceExam.setMarksGained(calculateMarks(statistics.getCorrect(), statistics.getWrong()));
+    }
+
+    private void endExam(PracticeExam practiceExam, LocalDateTime now) {
+        if (practiceExam.getEndTime().isBefore(now)) {
+            practiceExam.setStatus(ExamStatus.ENDED);
+            updateMarkAndPosition(practiceExam);
+        }
+    }
+
+    @Transactional
+    public void endExam(int id) {
+        PracticeExam practiceExam = getPracticeExam(id);
+        LocalDateTime now = LocalDateTime.now();
+        endExam(practiceExam, now);
     }
 
     @Transactional
     public void checkExamEndingStatus() {
         List<PracticeExam> runningExams = getRunningExams();
         LocalDateTime now = LocalDateTime.now();
-        runningExams.stream()
-                .filter(exam -> exam.getEndTime().isBefore(now))
-                .forEach(exam -> {
-                    exam.setStatus(ExamStatus.ENDED);
-                    updateMarkAndPosition(exam);
-                });
+        runningExams
+                .forEach(exam -> endExam(exam, now));
     }
 }

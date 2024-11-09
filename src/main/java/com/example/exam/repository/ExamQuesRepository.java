@@ -7,6 +7,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
+import java.util.Optional;
 
 
 @Repository
@@ -18,4 +19,6 @@ public interface ExamQuesRepository extends JpaRepository<ExamQuestion, Integer>
     int countByExamId(Integer examId);
 
     boolean existsByQuestionIdAndExamId(Integer questionsId, Integer examId);
+
+    Optional<ExamQuestion> findByExamIdAndQuestionId(Integer examId, Integer questionId);
 }

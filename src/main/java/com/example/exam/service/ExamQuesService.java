@@ -6,6 +6,7 @@ import com.example.exam.repository.ExamQuesRepository;
 import com.example.exam.repository.ExamRepository;
 import com.example.exception.NotFoundException;
 import com.example.qa.model.QuesResponse;
+import com.example.qa.model.Question;
 import com.example.qa.service.QuestionService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -16,7 +17,9 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Service
 @Slf4j
@@ -28,21 +31,36 @@ public class ExamQuesService {
     private final QuestionService questionService;
     private final UserUtil userUtil;
 
-    private ExamQuestion buildExamQuestion(ExamQuesRequest request) {
+    private ExamQuestion buildExamQuestion(ExamQuesRequest request, Map<Integer, Integer> quesIdToAnsMap) {
         ExamQuestion examQuestion = new ExamQuestion();
         examQuestion.setQuestionId(request.getQuestionId());
         examQuestion.setExamId(request.getExamId());
         if (request.getMarks() != null)
             examQuestion.setMarks(request.getMarks());
-        examQuestion.setAns(request.getAns());
+        if (request.getAns() != null) {
+            examQuestion.setAns(request.getAns());
+        } else {
+            examQuestion.setAns(quesIdToAnsMap.get(request.getQuestionId()));
+        }
         return examQuestion;
+    }
+
+    private Map<Integer, Integer> getQuestionidToAnsMap(List<ExamQuesRequest> examQuesRequests) {
+        List<Integer> questionIds = examQuesRequests.stream()
+                .map(ExamQuesRequest::getQuestionId)
+                .toList();
+        return questionService.findAllByIds(questionIds)
+                .stream()
+                .collect(Collectors.toMap(Question::getId, Question::getMcqAns));
     }
 
     @Transactional
     public List<ExamQuestion> createExamQuestions(List<ExamQuesRequest> examQuesRequests) {
+        Map<Integer, Integer> quesIdToAnsMap = getQuestionidToAnsMap(examQuesRequests);
         List<ExamQuestion> examQuestions = examQuesRequests.stream()
-                .map(this::buildExamQuestion)
+                .map(request -> buildExamQuestion(request, quesIdToAnsMap))
                 .toList();
+
         try {
             examQuesRepository.saveAll(examQuestions);
             return examQuestions;
@@ -82,6 +100,10 @@ public class ExamQuesService {
 
     public Page<ExamQuestion> findAllByExamId(int examId, Pageable pageable) {
         return examQuesRepository.findAllByExamId(examId, pageable);
+    }
+
+    public Optional<ExamQuestion> findByExamIdAndQuestionId(int examId, int questionId) {
+        return examQuesRepository.findByExamIdAndQuestionId(examId, questionId);
     }
 
     public boolean isQuesAlreadyChosenForThisExam(ExamQuestion request) {

@@ -69,6 +69,10 @@ public class QuestionService {
         return questionRepository.findById(id);
     }
 
+    public List<Question> findAllByIds(List<Integer> ids) {
+        return questionRepository.findAllById(ids);
+    }
+
     public Question getQuestion(int id) {
         return findById(id)
                 .orElseThrow(() -> new NotFoundException("Question not found with id " + id));

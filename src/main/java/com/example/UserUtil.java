@@ -28,4 +28,8 @@ public class UserUtil {
         return entity.getCreatedBy().equals(getUserName()) || isAdmin();
     }
 
+    public <T extends Auditable> boolean hasFetchPermission(T entity) {
+        return hasEditPermission(entity);
+    }
+
 }

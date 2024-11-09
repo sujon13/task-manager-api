@@ -1,12 +1,9 @@
 package com.example.exam.model;
 
 import com.example.exam.converter.ExamStatusConverter;
-import com.example.exam.converter.ExamTypeConverter;
 import com.example.exam.enums.ExamStatus;
-import com.example.exam.enums.ExamType;
 import com.example.qa.model.Auditable;
 import jakarta.persistence.*;
-import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -15,19 +12,21 @@ import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 import java.time.LocalDateTime;
 
-
 @Setter
 @Getter
 @Entity
-@Table(name = "exams")
+@Table(name = "practice_exams")
 @NoArgsConstructor
 @AllArgsConstructor
 @EntityListeners(AuditingEntityListener.class)
-public class Exam extends Auditable {
+public class PracticeExam extends Auditable {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id")
     private Integer id;
+
+    @Column(name = "parent_exam_id")
+    private Integer parentExamId;
 
     @Column(name = "name")
     private String name;
@@ -48,14 +47,18 @@ public class Exam extends Auditable {
     @Convert(converter = ExamStatusConverter.class)
     private ExamStatus status = ExamStatus.NOT_SCHEDULED;
 
-    @NotNull
-    @Column(name = "exam_type", updatable = false)
-    @Convert(converter = ExamTypeConverter.class)
-    private ExamType examType = ExamType.PRACTICE;
-
     @Column(name = "total_questions")
     private Integer totalQuestions;
 
     @Column(name = "total_marks")
     private Double totalMarks;
+
+    @Column(name = "examinee_user_name")
+    private String examineeUserName;
+
+    @Column(name = "marks_gained")
+    private Double marksGained;
+
+    @Column(name = "probable_position")
+    private Integer probablePosition;
 }

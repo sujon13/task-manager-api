@@ -1,6 +1,7 @@
 package com.example.exam.service;
 
 import com.example.UserUtil;
+import com.example.exam.enums.ExamStatus;
 import com.example.exam.model.Exam;
 import com.example.exam.model.ExamEditRequest;
 import com.example.exam.model.ExamRequest;
@@ -14,6 +15,7 @@ import org.springframework.security.access.AccessDeniedException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDateTime;
 import java.util.Optional;
 
 
@@ -26,15 +28,31 @@ public class ExamService {
     private final ExamValidationService examValidationService;
     private final UserUtil userUtil;
 
-    private Exam buildExam(ExamRequest request) {
-        Exam exam = new Exam();
-        exam.setName(request.getName());
-        exam.setDescription(request.getDescription());
+    private void setExamStatus(Exam exam) {
+        if (exam.getStartTime() == null)
+            exam.setStatus(ExamStatus.NOT_SCHEDULED);
+        else if (exam.getStartTime().isAfter(LocalDateTime.now()))
+            exam.setStatus(ExamStatus.NOT_STARTED);
+        else if (exam.getEndTime().isAfter(LocalDateTime.now()))
+            exam.setStatus(ExamStatus.RUNNING);
+        else exam.setStatus(ExamStatus.ENDED);
+    }
+
+    private void addExamTimeAndStatus(Exam exam, ExamRequest request) {
         exam.setStartTime(request.getStartTime());
         exam.setAllocatedTimeInMin(request.getAllocatedTimeInMin());
         if (exam.getStartTime() != null) {
             exam.setEndTime(exam.getStartTime().plusMinutes(exam.getAllocatedTimeInMin()));
+            setExamStatus(exam);
         }
+    }
+
+    private Exam buildExam(ExamRequest request) {
+        Exam exam = new Exam();
+        exam.setName(request.getName());
+        exam.setDescription(request.getDescription());
+        addExamTimeAndStatus(exam, request);
+
         if (request.getExamType() != null) {
             exam.setExamType(request.getExamType());
         }
@@ -44,7 +62,7 @@ public class ExamService {
     }
 
     @Transactional
-    public Exam createExam(ExamRequest request) {
+    public Exam addExam(ExamRequest request) {
         Exam exam = buildExam(request);
         try {
             examRepository.save(exam);

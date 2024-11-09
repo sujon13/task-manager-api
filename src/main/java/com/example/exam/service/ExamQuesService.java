@@ -92,30 +92,40 @@ public class ExamQuesService {
         return examQuesRepository.countByExamId(examId);
     }
 
-    private ExamQuesResponse buildExamQuesResponse(Exam exam, List<QuesResponse> questions) {
-        return ExamQuesResponse.builder()
+    private ExamResponse buildExamResponse(Exam exam) {
+        return ExamResponse.builder()
                 .id(exam.getId())
                 .name(exam.getName())
                 .description(exam.getDescription())
                 .startTime(exam.getStartTime())
                 .allocatedTimeInMin(exam.getAllocatedTimeInMin())
                 .endTime(exam.getEndTime())
+                .status(exam.getStatus())
                 .examType(exam.getExamType())
                 .totalQuestions(exam.getTotalQuestions())
                 .totalMarks(exam.getTotalMarks())
+                .build();
+    }
+
+    private ExamQuesResponse buildExamQuesResponse(Exam exam, List<QuesResponse> questions) {
+        return ExamQuesResponse.builder()
+                .examResponse(buildExamResponse(exam))
                 .questions(questions)
                 .build();
     }
 
-    public ExamQuesResponse getExamQuestions(int examId, Pageable pageable) {
-        Exam exam = examRepository.getExam(examId);
+    public List<QuesResponse> getQuestionList(int examId, Pageable pageable) {
         Page<ExamQuestion> examQuestions = findAllByExamId(examId, pageable);
 
         List<Integer> quesIds = examQuestions.stream()
                 .map(ExamQuestion::getQuestionId)
                 .toList();
+        return questionService.getQuesResponsesByIds(quesIds);
+    }
 
-        List<QuesResponse> quesResponses = questionService.getQuesResponsesByIds(quesIds);
+    public ExamQuesResponse getExamQuestions(int examId, Pageable pageable) {
+        List<QuesResponse> quesResponses = getQuestionList(examId, pageable);
+        Exam exam = examRepository.getExam(examId);
         return buildExamQuesResponse(exam, quesResponses);
     }
 

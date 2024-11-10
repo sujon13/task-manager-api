@@ -12,9 +12,9 @@ import java.util.Optional;
 
 @Repository
 public interface ExamQuesRepository extends JpaRepository<ExamQuestion, Integer> {
-    List<ExamQuestion> findAllByQuestionId(Integer questionsId);
-
     Page<ExamQuestion> findAllByExamId(Integer examId, Pageable pageable);
+
+    List<ExamQuestion> findAllByExamId(Integer examId);
 
     int countByExamId(Integer examId);
 

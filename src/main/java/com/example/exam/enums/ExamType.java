@@ -10,7 +10,8 @@ import java.util.stream.Stream;
 public enum ExamType {
     REAL(0),
     LIVE(1),
-    PRACTICE(2);
+    SAMPLE(2),
+    PRACTICE(3);
 
     private static final Map<Integer, ExamType> mapByValue;
 
@@ -27,5 +28,9 @@ public enum ExamType {
 
     public static ExamType getByValue(Integer value) {
         return value == null ? null : mapByValue.get(value);
+    }
+
+    public static boolean isLiveOrPractice(ExamType examType) {
+        return examType == LIVE || examType == PRACTICE;
     }
 }

@@ -2,7 +2,7 @@ package com.example.exam.controller;
 
 import com.example.exam.model.Exam;
 import com.example.exam.model.ExamEditRequest;
-import com.example.exam.model.ExamRequest;
+import com.example.exam.model.ExamAddRequest;
 import com.example.exam.service.ExamService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -24,7 +24,7 @@ public class ExamRestController {
     private final ExamService examService;
 
     @PostMapping("")
-    public ResponseEntity<Exam> addExam(@Valid @RequestBody final ExamRequest request) {
+    public ResponseEntity<Exam> addExam(@Valid @RequestBody final ExamAddRequest request) {
         try {
             Exam exam = examService.addExam(request);
             return ResponseEntity.status(HttpStatus.CREATED).body(exam);

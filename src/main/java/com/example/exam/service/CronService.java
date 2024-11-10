@@ -11,12 +11,12 @@ import java.time.LocalDateTime;
 @RequiredArgsConstructor
 @Slf4j
 public class CronService {
-    private final PracticeExamService practiceExamService;
+    private final ExamService examService;
     private static final int PER_MINUTE = 60 * 1000;
 
     @Scheduled(fixedRate = PER_MINUTE)
     public void checkExamEndingStatus() {
         log.info("checking exam ending status at {}", LocalDateTime.now());
-        practiceExamService.checkExamEndingStatus();
+        examService.checkExamEndingStatus();
     }
 }

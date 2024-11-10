@@ -17,11 +17,19 @@ public class UserUtil {
         return getUserName(SecurityContextHolder.getContext().getAuthentication());
     }
 
-    public boolean isAdmin() {
+    public boolean hasAnyRole(String... roles) {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         return authentication.getAuthorities()
                 .stream()
-                .anyMatch(auth -> auth.getAuthority().equals("ROLE_ADMIN"));
+                //.anyMatch(auth -> auth.getAuthority().equals("ROLE" + role));
+                .anyMatch(auth ->
+                        java.util.Arrays.stream(roles)
+                                .anyMatch(role -> auth.getAuthority().equals("ROLE_" + role))
+                );
+    }
+
+    public boolean isAdmin() {
+        return hasAnyRole("ADMIN");
     }
 
     public <T extends Auditable> boolean hasEditPermission(T entity) {

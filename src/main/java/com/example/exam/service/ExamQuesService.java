@@ -88,6 +88,11 @@ public class ExamQuesService {
         return examQuestion;
     }
 
+    @Transactional
+    public List<ExamQuestion> saveExamQuestions(List<ExamQuestion> examQuestions) {
+        return examQuesRepository.saveAll(examQuestions);
+    }
+
     public Optional<ExamQuestion> findById(int id) {
         return examQuesRepository.findById(id);
     }
@@ -97,9 +102,12 @@ public class ExamQuesService {
                 .orElseThrow(() -> new NotFoundException("Exam question not found with id " + id));
     }
 
-
     public Page<ExamQuestion> findAllByExamId(int examId, Pageable pageable) {
         return examQuesRepository.findAllByExamId(examId, pageable);
+    }
+
+    public List<ExamQuestion> findAllByExamId(int examId) {
+        return examQuesRepository.findAllByExamId(examId);
     }
 
     public Optional<ExamQuestion> findByExamIdAndQuestionId(int examId, int questionId) {

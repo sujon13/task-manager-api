@@ -27,6 +27,9 @@ public class Exam extends Auditable {
     @Column(name = "id")
     private Integer id;
 
+    @Column(name = "parent_id")
+    private Integer parentId;
+
     @Column(name = "name")
     private String name;
 
@@ -56,4 +59,7 @@ public class Exam extends Auditable {
 
     @Column(name = "total_marks")
     private Double totalMarks;
+
+    @Column(name = "examinee")
+    private String examinee;
 }

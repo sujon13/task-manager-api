@@ -13,7 +13,8 @@ import java.util.List;
 public interface SubmissionRepository extends JpaRepository<Submission, Integer> {
     Page<Submission> findAll(Pageable pageable);
 
-    List<Submission> findAllByExamIdAndExamineeUserName(Integer examId, String userName);
+    List<Submission> findAllByExamId(int examId);
+    List<Submission> findAllByExamIdAndExaminee(Integer examId, String examinee);
 
     default Submission getSubmission(int id) {
         return findById(id)

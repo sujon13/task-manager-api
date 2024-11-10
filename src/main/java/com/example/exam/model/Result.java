@@ -13,10 +13,12 @@ import lombok.Setter;
 @Setter
 @Getter
 @Entity
-@Table(name = "submissions")
+@Table(name = "results", indexes = {
+        @Index(name = "idx_results_examId_examinee", columnList = "exam_id, examinee")
+})
 @NoArgsConstructor
 @AllArgsConstructor
-public class Submission extends Auditable {
+public class Result extends Auditable {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id")
@@ -30,15 +32,12 @@ public class Submission extends Auditable {
     @Convert(converter = ExamTypeConverter.class)
     private ExamType examType;
 
-    @Column(name = "ques_id")
-    private Integer quesId;
-
     @Column(name = "examinee")
     private String examinee;
 
-    @Column(name = "given_ans")
-    private Integer givenAns;
+    @Column(name = "marks_obtained")
+    private Double marksObtained;
 
-    @Column(name = "is_correct")
-    private boolean isCorrect = false;
+    @Column(name = "position")
+    private Integer position;
 }

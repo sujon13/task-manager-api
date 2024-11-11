@@ -10,9 +10,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
+import java.util.*;
 
 @Service
 @Slf4j
@@ -64,7 +62,35 @@ public class ResultService {
         }
     }
 
-    public void updateMark(Exam exam) {
+    private List<Result> getSortedResults(List<Result> results) {
+        return results.stream()
+                .sorted(Comparator.comparingDouble(Result::getMarksObtained).reversed())
+                .toList();
+    }
+
+    private List<Result> addMeritPosition(List<Result> results) {
+        List<Result> sortedResults = getSortedResults(results);
+
+        sortedResults.getFirst().setPosition(1);
+
+        int numOfExamineesAttended = sortedResults.size();
+        int merit = 1;
+        for (int pos = 1; pos < numOfExamineesAttended; pos++) {
+            Result current = sortedResults.get(pos);
+            Result previous = sortedResults.get(pos - 1);
+
+            if (Objects.equals(current.getMarksObtained(), previous.getMarksObtained())) {
+                current.setPosition(previous.getPosition());
+            } else {
+                current.setPosition(merit);
+            }
+
+            merit++;
+        }
+        return sortedResults;
+    }
+
+    public void updateMarkAndMeritPosition(Exam exam) {
         if (ExamType.isPractice(exam.getExamType())) {
             handlePracticeExam(exam);
             return;
@@ -75,6 +101,8 @@ public class ResultService {
                 .stream()
                 .map(entry -> buildResult(exam, entry.getKey(), entry.getValue()))
                 .toList();
-        save(results);
+
+        List<Result> modifiedResults = addMeritPosition(results);
+        save(modifiedResults);
     }
 }

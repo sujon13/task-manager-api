@@ -20,7 +20,7 @@ public class CronService {
                 .forEach(exam -> {
                     examStatusService.updateExamStatus(exam);
                     if (examStatusService.isExamOver(exam)) {
-                        resultService.updateMark(exam);
+                        resultService.updateMarkAndMeritPosition(exam);
                     }
                 });
     }

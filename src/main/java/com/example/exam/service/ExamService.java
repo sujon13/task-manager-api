@@ -150,7 +150,7 @@ public class ExamService {
 
         userExamRecordService.exit(exam);
 
-        if (ExamType.PRACTICE.equals(exam.getExamType()))
+        if (ExamType.isPractice(exam.getExamType()))
             resultService.updateMark(exam, userUtil.getUserName());
     }
 

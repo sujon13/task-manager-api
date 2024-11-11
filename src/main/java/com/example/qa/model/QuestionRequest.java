@@ -2,6 +2,7 @@ package com.example.qa.model;
 
 import com.example.qa.enums.QuesTypeEnum;
 import com.example.qa.enums.QuestionVersion;
+import jakarta.validation.constraints.Size;
 import lombok.*;
 
 import java.util.ArrayList;
@@ -23,9 +24,12 @@ public class QuestionRequest {
     @Builder.Default
     private QuestionVersion version = QuestionVersion.ENGLISH;
 
+    @Size(max = 1024)
     private String questionEn;
+    @Size(max = 512)
     private String questionBn;
     private Integer mcqAns;
+    @Size(max = 4096)
     private String explanation;
     private boolean visible = true;
 

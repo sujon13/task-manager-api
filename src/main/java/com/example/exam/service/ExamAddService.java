@@ -18,7 +18,7 @@ import java.util.List;
 @Service
 @Slf4j
 @RequiredArgsConstructor
-@Transactional(readOnly = true)
+@Transactional
 public class ExamAddService {
     private final ExamQuesService examQuesService;
     private final ExamStatusService examStatusService;
@@ -61,7 +61,6 @@ public class ExamAddService {
         return exam;
     }
 
-    @Transactional
     public Exam addExam(ExamAddRequest request) {
         checkSecurity(request.getExamType());
         Exam exam = buildExam(request);
@@ -129,7 +128,6 @@ public class ExamAddService {
         examQuesService.saveExamQuestions(modifiedExamQuestions);
     }
 
-    @Transactional
     public Exam cloneExam(int parentId, ExamCloneRequest cloneRequest) {
         Exam parentExam = examService.getExam(parentId);
 

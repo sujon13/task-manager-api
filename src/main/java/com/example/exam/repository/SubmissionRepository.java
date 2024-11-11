@@ -15,6 +15,7 @@ public interface SubmissionRepository extends JpaRepository<Submission, Integer>
 
     List<Submission> findAllByExamId(int examId);
     List<Submission> findAllByExamIdAndExaminee(Integer examId, String examinee);
+    boolean existsByExamIdAndQuesIdAndExaminee(Integer examId, Integer quesId, String examinee);
 
     default Submission getSubmission(int id) {
         return findById(id)

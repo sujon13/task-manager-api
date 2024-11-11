@@ -1,7 +1,10 @@
 package com.example.exam.service;
 
 import com.example.UserUtil;
-import com.example.exam.model.*;
+import com.example.exam.model.Exam;
+import com.example.exam.model.Submission;
+import com.example.exam.model.SubmissionRequest;
+import com.example.exam.model.SubmissionStatistics;
 import com.example.exam.repository.SubmissionRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -11,7 +14,6 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
@@ -26,14 +28,10 @@ public class SubmissionService {
     private final ExamStatusService examStatusService;
 
 
-    boolean isAnsCorrect(SubmissionRequest request) {
-        Optional<ExamQuestion> optionalExamQuestion =
-                examQuesService.findByExamIdAndQuestionId(request.getExamId(), request.getQuestionId());
-        if (optionalExamQuestion.isEmpty())
-            return false;
-        ExamQuestion examQuestion = optionalExamQuestion.get();
-
-        return request.getGivenAns().equals(examQuestion.getAns());
+    private boolean isAnsCorrect(SubmissionRequest request) {
+        return examQuesService.findByExamIdAndQuestionId(request.getExamId(), request.getQuestionId())
+                .map(examQuestion -> request.getGivenAns().equals(examQuestion.getAns()))
+                .orElse(false);
     }
 
     private Submission buildSubmission(SubmissionRequest request) {
@@ -47,17 +45,27 @@ public class SubmissionService {
         return submission;
     }
 
-    private void checkSecurity(final int examId) {
-        boolean canAnsBeSubmittedNow =
+    private boolean alreadySubmitted(SubmissionRequest request) {
+        return submissionRepository.existsByExamIdAndQuesIdAndExaminee(request.getExamId(),
+                request.getQuestionId(), userUtil.getUserName());
+    }
+
+    private void checkSecurity(final SubmissionRequest request) {
+        final int examId = request.getExamId();
+        boolean canBeSubmitted =
                 examStatusService.isExamRunning(examId) && userExamRecordService.hasUserEnteredTheExam(examId);
-        if (!canAnsBeSubmittedNow) {
+        if (!canBeSubmitted) {
             throw new AccessDeniedException("Exam is ended or you have already exited from the exam!");
+        }
+
+        if (alreadySubmitted(request)) {
+            throw new AccessDeniedException("Ans is already submitted for this question!");
         }
     }
 
     @Transactional
-    public Submission addSubmission(SubmissionRequest request) {
-        checkSecurity(request.getExamId());
+    public Submission addSubmission(final int examId, SubmissionRequest request) {
+        checkSecurity(request);
 
         Submission submission = buildSubmission(request);
         submissionRepository.save(submission);

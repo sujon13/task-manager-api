@@ -1,6 +1,7 @@
 package com.example.exam.repository;
 
 import com.example.exam.enums.ExamStatus;
+import com.example.exam.enums.ExamType;
 import com.example.exam.model.Exam;
 import com.example.exception.NotFoundException;
 import org.springframework.data.domain.Page;
@@ -13,6 +14,8 @@ import java.util.List;
 @Repository
 public interface ExamRepository extends JpaRepository<Exam, Integer> {
     Page<Exam> findAll(Pageable pageable);
+
+    List<Exam> findAllByExamTypeIn(List<ExamType> examTypes);
 
     List<Exam> findAllByStatus(ExamStatus status);
 

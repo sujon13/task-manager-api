@@ -52,6 +52,9 @@ public class Question extends Auditable {
     @Column(name = "mcq_ans")
     private Integer mcqAns; // id of option
 
+    @Column(name = "explanation", length = 8192)
+    private String explanation;
+
     @Column(name = "visible")
     private boolean visible = true;
 

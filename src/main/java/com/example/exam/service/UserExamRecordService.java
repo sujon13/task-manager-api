@@ -27,8 +27,19 @@ public class UserExamRecordService {
                 .isPresent();
     }
 
+    public boolean hasUserExitedFromTheExam(final int examId) {
+        return findByExamId(examId)
+                .filter(examRecord -> UserExamStatus.EXITED.equals(examRecord.getUserExamStatus()))
+                .isPresent();
+    }
+
     // will be called only from exam service (enterExam method)
     public void enter(final int examId) {
+        if (hasUserEnteredTheExam(examId)) {
+            log.info("{} already entered the exam", userUtil.getUserName());
+            return;
+        }
+
         UserExamRecord userExamRecord = new UserExamRecord();
         userExamRecord.setExamId(examId);
         userExamRecord.setExaminee(userUtil.getUserName());

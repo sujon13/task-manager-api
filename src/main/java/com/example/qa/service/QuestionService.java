@@ -37,6 +37,7 @@ public class QuestionService {
         question.setQuestionEn(request.getQuestionEn());
         question.setQuestionBn(request.getQuestionBn());
         question.setMcqAns(request.getMcqAns()); // 1 (a) 2 (b) (1-5)
+        question.setExplanation(request.getExplanation());
         question.setVisible(request.isVisible());
         return question;
     }
@@ -119,6 +120,8 @@ public class QuestionService {
             question.setQuestionBn(request.getQuestionBn());
         if (request.getMcqAns() != null)
             question.setMcqAns(request.getMcqAns());
+        if (request.getExplanation() != null)
+            question.setExplanation(request.getExplanation());
         if (request.getVisible() != null)
             question.setVisible(request.getVisible());
         return question;

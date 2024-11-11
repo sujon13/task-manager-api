@@ -17,7 +17,7 @@ import java.time.LocalDateTime;
 public class ExamStatusService {
     private final ExamRepository examRepository;
 
-    public void setExamStatus(Exam exam) {
+    public void updateExamStatus(Exam exam) {
         if (exam.getStartTime() == null)
             exam.setStatus(ExamStatus.NOT_SCHEDULED);
         else if (exam.getStartTime().isAfter(LocalDateTime.now()))
@@ -27,17 +27,11 @@ public class ExamStatusService {
         else exam.setStatus(ExamStatus.ENDED);
     }
 
-    public void updateExamStatus(Exam exam) {
-        setExamStatus(exam);
-    }
-
-    public void updateExamStatus(final int examId) {
-        Exam exam = examRepository.getExam(examId);
-        updateExamStatus(exam);
+    public boolean isExamOver(Exam exam) {
+        return ExamStatus.ENDED.equals(exam.getStatus());
     }
 
     public boolean isExamRunning(final Exam exam) {
-        updateExamStatus(exam);
         return ExamStatus.RUNNING.equals(exam.getStatus());
     }
 

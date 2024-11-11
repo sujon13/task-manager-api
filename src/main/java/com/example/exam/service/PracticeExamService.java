@@ -19,12 +19,6 @@ import org.springframework.transaction.annotation.Transactional;
 public class PracticeExamService {
     private final UserUtil userUtil;
     private final ExamService examService;
-    private final ExamStatusService examStatusService;
-
-
-    private void updateExamStatus(Exam practiceExam) {
-        examStatusService.setExamStatus(practiceExam);
-    }
 
     @Transactional
     public Exam cancelPracticeExam(int id) {
@@ -32,8 +26,6 @@ public class PracticeExamService {
         if (ExamType.PRACTICE.equals(practiceExam.getExamType()) && userUtil.hasEditPermission(practiceExam)) {
             throw new AccessDeniedException("You do not have permission to cancel the exam!");
         }
-
-        updateExamStatus(practiceExam);
 
         if (ExamStatus.ENDED.equals(practiceExam.getStatus())) {
             throw new AccessDeniedException("This exam is already ended!");
@@ -54,7 +46,6 @@ public class PracticeExamService {
         if (ExamType.PRACTICE.equals(practiceExam.getExamType()) && userUtil.hasEditPermission(practiceExam)) {
             throw new AccessDeniedException("You do not have permission to reschedule the exam!");
         }
-        updateExamStatus(practiceExam);
 
         if (isReschedulePossible(practiceExam)) {
             practiceExam.setStartTime(editRequest.getStartTime());
@@ -66,7 +57,6 @@ public class PracticeExamService {
             throw new AccessDeniedException("Now reschedule is impossible!");
         }
 
-        updateExamStatus(practiceExam);
         return practiceExam;
     }
 }

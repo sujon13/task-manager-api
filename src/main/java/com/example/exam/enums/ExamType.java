@@ -33,4 +33,8 @@ public enum ExamType {
     public static boolean isLiveOrPractice(ExamType examType) {
         return examType == LIVE || examType == PRACTICE;
     }
+
+    public static boolean isPractice(ExamType examType) {
+        return examType == PRACTICE;
+    }
 }

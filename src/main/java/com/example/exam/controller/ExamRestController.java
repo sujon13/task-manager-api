@@ -3,6 +3,7 @@ package com.example.exam.controller;
 import com.example.exam.model.Exam;
 import com.example.exam.model.ExamEditRequest;
 import com.example.exam.model.ExamAddRequest;
+import com.example.exam.service.ExamAddService;
 import com.example.exam.service.ExamService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -22,11 +23,12 @@ import org.springframework.web.bind.annotation.*;
 @RequestMapping("/api/v1/exams")
 public class ExamRestController {
     private final ExamService examService;
+    private final ExamAddService examAddService;
 
     @PostMapping("")
     public ResponseEntity<Exam> addExam(@Valid @RequestBody final ExamAddRequest request) {
         try {
-            Exam exam = examService.addExam(request);
+            Exam exam = examAddService.addExam(request);
             return ResponseEntity.status(HttpStatus.CREATED).body(exam);
         } catch (RuntimeException exception) {
             log.error(exception.getMessage());

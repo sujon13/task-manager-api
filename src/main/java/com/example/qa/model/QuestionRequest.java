@@ -26,6 +26,7 @@ public class QuestionRequest {
     private String questionEn;
     private String questionBn;
     private Integer mcqAns;
+    private String explanation;
     private boolean visible = true;
 
     @Builder.Default

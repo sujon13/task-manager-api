@@ -20,7 +20,7 @@ public class QuestionEditRequest {
     private String questionEn;
     private String questionBn;
     private Integer mcqAns;
-
+    private String explanation;
     private Boolean visible;
 
     @Builder.Default

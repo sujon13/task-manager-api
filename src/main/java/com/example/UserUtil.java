@@ -32,8 +32,12 @@ public class UserUtil {
         return hasAnyRole("ADMIN");
     }
 
+    public <T extends Auditable> boolean isCreator(T entity) {
+        return entity.getCreatedBy().equals(getUserName());
+    }
+
     public <T extends Auditable> boolean hasEditPermission(T entity) {
-        return entity.getCreatedBy().equals(getUserName()) || isAdmin();
+        return isCreator(entity) || isAdmin();
     }
 
     public <T extends Auditable> boolean hasFetchPermission(T entity) {

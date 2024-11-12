@@ -105,7 +105,7 @@ public class ExamAddService {
     }
 
     private void checkClonedExamSecurity(ExamType clonedExamType) {
-        if (ExamType.PRACTICE.equals(clonedExamType)) {
+        if (ExamType.isPractice(clonedExamType)) {
             if (!userUtil.hasAnyRole("USER")) {
                 throw new AccessDeniedException("Only users can create practice exams");
             }

@@ -3,10 +3,9 @@ package com.example.exam.service;
 import com.example.UserUtil;
 import com.example.exam.enums.ExamStatus;
 import com.example.exam.enums.ExamType;
-import com.example.exam.model.*;
+import com.example.exam.model.Exam;
 import com.example.exam.repository.ExamRepository;
 import com.example.exception.NotFoundException;
-import com.example.qa.model.QuesResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
@@ -25,8 +24,6 @@ import java.util.Optional;
 @Transactional(readOnly = true)
 public class ExamService {
     private final ExamRepository examRepository;
-    private final ExamQuesService examQuesService;
-    private final ExamValidationService examValidationService;
     private final ExamStatusService examStatusService;
     private final UserUtil userUtil;
     private final UserExamRecordService userExamRecordService;
@@ -35,50 +32,6 @@ public class ExamService {
     @Transactional
     public Exam saveExam(Exam exam) {
         return examRepository.save(exam);
-    }
-
-    private void updateQuesCount(Exam exam, ExamEditRequest request) {
-        if (request.getTotalQuestions() < exam.getTotalQuestions()) {
-            if (examValidationService.canTotalQuestionsBeReduced(exam.getId(), request.getTotalQuestions())) {
-                exam.setTotalQuestions(request.getTotalQuestions());
-            }
-        } else {
-            exam.setTotalQuestions(request.getTotalQuestions());
-        }
-    }
-
-    private void editExam(Exam exam, ExamEditRequest request) {
-        if (request.getName() != null)
-            exam.setName(request.getName());
-        if (request.getDescription() != null)
-            exam.setDescription(request.getDescription());
-        if (request.getStartTime() != null)
-            exam.setStartTime(request.getStartTime());
-        if (request.getAllocatedTimeInMin() != null) {
-            exam.setAllocatedTimeInMin(request.getAllocatedTimeInMin());
-            if (exam.getStartTime() != null) {
-                exam.setEndTime(exam.getStartTime().plusMinutes(exam.getAllocatedTimeInMin()));
-            }
-        }
-
-        if (request.getExamType() != null)
-            exam.setExamType(request.getExamType());
-
-        if (request.getTotalQuestions() != null)
-            updateQuesCount(exam, request);
-
-        if (request.getTotalMarks() != null)
-            exam.setTotalMarks(request.getTotalMarks());
-    }
-
-    @Transactional
-    public Exam updateExam(final int id, ExamEditRequest request) {
-        Exam exam = getExam(id);
-        if (!userUtil.hasEditPermission(exam)) {
-            throw new AccessDeniedException("You do not have permission to edit this exam");
-        }
-        editExam(exam, request);
-        return exam;
     }
 
     public Optional<Exam> findById(int id) {
@@ -115,7 +68,7 @@ public class ExamService {
             throw new AccessDeniedException("You can enter only in live or practice exams");
         }
 
-        if (ExamType.PRACTICE.equals(exam.getExamType()) && !userUtil.hasEditPermission(exam)) {
+        if (ExamType.isPractice(exam.getExamType()) && !userUtil.hasEditPermission(exam)) {
             throw new AccessDeniedException("You do not have permission to enter this exam");
         }
     }
@@ -138,51 +91,19 @@ public class ExamService {
             throw new AccessDeniedException("Exit is only possible from a live or practice exam");
         }
 
-        if (ExamType.PRACTICE.equals(exam.getExamType()) && !userUtil.hasEditPermission(exam)) {
-            throw new AccessDeniedException("You do not have permission to exit from this exam");
+        if (!userExamRecordService.hasUserEnteredTheExam(exam.getId())) {
+            throw new AccessDeniedException("You have not entered the exam!");
         }
     }
 
     @Transactional
     public void exitFromExam(final int examId) {
         final Exam exam = getExam(examId);
-        checkEntrancePermission(exam);
+        checkExitPermission(exam);
 
         userExamRecordService.exit(exam);
 
         if (ExamType.isPractice(exam.getExamType()))
             resultService.updateMark(exam, userUtil.getUserName());
-    }
-
-    private ExamResponse buildExamResponse(Exam exam) {
-        return ExamResponse.builder()
-                .id(exam.getId())
-                .name(exam.getName())
-                .description(exam.getDescription())
-                .startTime(exam.getStartTime())
-                .allocatedTimeInMin(exam.getAllocatedTimeInMin())
-                .endTime(exam.getEndTime())
-                .status(exam.getStatus())
-                .examType(exam.getExamType())
-                .totalQuestions(exam.getTotalQuestions())
-                .totalMarks(exam.getTotalMarks())
-                .build();
-    }
-
-    private ExamQuesResponse buildExamQuesResponse(Exam exam, List<QuesResponse> questions) {
-        return ExamQuesResponse.builder()
-                .examResponse(buildExamResponse(exam))
-                .questions(questions)
-                .build();
-    }
-
-    public ExamQuesResponse getExamQuestions(int id, Pageable pageable) {
-        Exam exam = getExam(id);
-        if (userUtil.hasFetchPermission(exam)) {
-            throw new AccessDeniedException("You do not have permission to attend the exam!");
-        }
-
-        List<QuesResponse> quesResponses = examQuesService.getQuestionList(exam.getParentId(), pageable);
-        return buildExamQuesResponse(exam, quesResponses);
     }
 }

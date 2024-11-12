@@ -29,6 +29,8 @@ public class ExamQuesService {
     private final ExamQuesRepository examQuesRepository;
     private final ExamRepository examRepository;
     private final QuestionService questionService;
+    private final ExamStatusService examStatusService;
+    private final UserExamRecordService userExamRecordService;
     private final UserUtil userUtil;
 
     private ExamQuestion buildExamQuestion(ExamQuesRequest request, Map<Integer, Integer> quesIdToAnsMap) {
@@ -89,8 +91,8 @@ public class ExamQuesService {
     }
 
     @Transactional
-    public List<ExamQuestion> saveExamQuestions(List<ExamQuestion> examQuestions) {
-        return examQuesRepository.saveAll(examQuestions);
+    public void saveExamQuestions(List<ExamQuestion> examQuestions) {
+        examQuesRepository.saveAll(examQuestions);
     }
 
     public Optional<ExamQuestion> findById(int id) {
@@ -153,9 +155,20 @@ public class ExamQuesService {
         return questionService.getQuesResponsesByIds(quesIds);
     }
 
+    private void checkExamQuesViewPermission(final Exam exam) {
+        if (examStatusService.isExamRunning(exam)) {
+            if (!userUtil.hasFetchPermission(exam) && !userExamRecordService.hasUserEnteredTheExam(exam.getId())) {
+                throw new AccessDeniedException("You do not have permission to view this exam question");
+            }
+        }
+    }
+
     public ExamQuesResponse getExamQuestions(int examId, Pageable pageable) {
-        List<QuesResponse> quesResponses = getQuestionList(examId, pageable);
         Exam exam = examRepository.getExam(examId);
+
+        checkExamQuesViewPermission(exam);
+
+        List<QuesResponse> quesResponses = getQuestionList(examId, pageable);
         return buildExamQuesResponse(exam, quesResponses);
     }
 

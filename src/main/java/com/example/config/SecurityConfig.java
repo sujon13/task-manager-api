@@ -40,12 +40,18 @@ public class SecurityConfig {
                         .requestMatchers(HttpMethod.PUT, PREFIX + "/questions/**").hasAnyRole("QUESTIONER", "ADMIN")
 
                         .requestMatchers(HttpMethod.POST, PREFIX + "/exams").hasAnyRole("EXAMINER", "ADMIN")
+                        .requestMatchers(HttpMethod.POST, PREFIX + "/exams/*/clone")
+                            .hasAnyRole("EXAMINER", "ADMIN", "USER")
+                        .requestMatchers(HttpMethod.POST, PREFIX + "/exams/*/submissions").hasRole("USER")
                         .requestMatchers(HttpMethod.GET, PREFIX + "/exams").permitAll()
-                        .requestMatchers(HttpMethod.PUT, PREFIX + "/exams/**").hasAnyRole("EXAMINER", "ADMIN")
+                        .requestMatchers(HttpMethod.POST, PREFIX + "/exams/*/enter", PREFIX + "/exams/*/exit").hasRole("USER")
+                        .requestMatchers(HttpMethod.PUT, PREFIX + "/exams/*").hasAnyRole("EXAMINER", "ADMIN", "USER")
+                        .requestMatchers(HttpMethod.POST, PREFIX + "/exams/*/cancel", PREFIX + "/exams/*/reschedule")
+                            .hasAnyRole("EXAMINER", "ADMIN", "USER")
 
                         .requestMatchers(HttpMethod.POST, PREFIX + "/exams/*/questions").hasAnyRole("EXAMINER", "ADMIN")
                         .requestMatchers(HttpMethod.GET, PREFIX + "/exams/*/questions").permitAll()
-                        .requestMatchers(HttpMethod.PUT, PREFIX + "/exams/*/questions/**").hasAnyRole("EXAMINER", "ADMIN")
+                        .requestMatchers(HttpMethod.PUT, PREFIX + "/exams/*/questions/*").hasAnyRole("EXAMINER", "ADMIN")
 
                         .anyRequest().authenticated()  // Secure other endpoints
                 )

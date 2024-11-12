@@ -3,6 +3,7 @@ package com.example.exam.controller;
 import com.example.exam.model.*;
 import com.example.exam.service.ExamAddService;
 import com.example.exam.service.ExamService;
+import com.example.exam.service.ExamUpdateService;
 import com.example.exam.service.SubmissionService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -23,6 +24,7 @@ import org.springframework.web.bind.annotation.*;
 public class ExamRestController {
     private final ExamService examService;
     private final ExamAddService examAddService;
+    private final ExamUpdateService examUpdateService;
     private final SubmissionService submissionService;
 
     @PostMapping("")
@@ -55,7 +57,7 @@ public class ExamRestController {
 
         try {
             Submission submission = submissionService.addSubmission(examId, request);
-            return ResponseEntity.status(HttpStatus.CREATED).body(submission);
+            return ResponseEntity.ok(submission);
         } catch (RuntimeException exception) {
             log.error(exception.getMessage());
             return ResponseEntity.internalServerError().build();
@@ -69,9 +71,29 @@ public class ExamRestController {
         return examService.findExams(pageable);
     }
 
+    @PostMapping("/{id}/enter")
+    public void enter(@PathVariable("id") final int examId) {
+        examService.enterExam(examId);
+    }
+
+    @PostMapping("/{id}/exit")
+    public void exit(@PathVariable("id") final int examId) {
+        examService.exitFromExam(examId);
+    }
+
     @PutMapping("/{id}")
     public Exam updateExam(@PathVariable final int id, @Valid @RequestBody final ExamEditRequest request) {
-        return examService.updateExam(id, request);
+        return examUpdateService.updateExam(id, request);
+    }
+
+    @PostMapping("/{id}/cancel")
+    public Exam cancel(@PathVariable("id") final int examId) {
+        return examUpdateService.cancelExam(examId);
+    }
+
+    @PostMapping("/{id}/reschedule")
+    public Exam reschedule(@PathVariable("id") final int examId, @Valid @RequestBody PrExamEditRequest editRequest) {
+        return examUpdateService.rescheduleExam(examId, editRequest);
     }
 
 }

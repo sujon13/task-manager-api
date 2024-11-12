@@ -1,7 +1,6 @@
 package com.example.exam.service;
 
 import com.example.UserUtil;
-import com.example.exam.enums.ExamStatus;
 import com.example.exam.enums.ExamType;
 import com.example.exam.model.Exam;
 import com.example.exam.repository.ExamRepository;
@@ -43,20 +42,20 @@ public class ExamService {
                 .orElseThrow(() ->  new NotFoundException("Exam not found with id " + id));
     }
 
-    public List<Exam> findAll() {
-        return examRepository.findAll();
+    public List<Exam> findAllByExamTypeIn(List<ExamType> examTypeList) {
+        return examRepository.findAllByExamTypeIn(examTypeList);
     }
 
     public List<Exam> findAllLiveAndPracticeExams() {
-        return examRepository.findAllByExamTypeIn(List.of(ExamType.LIVE, ExamType.PRACTICE));
+        return findAllByExamTypeIn(List.of(ExamType.LIVE, ExamType.PRACTICE));
     }
 
-    public Page<Exam> findExams(Pageable pageable) {
-        return examRepository.findAll(pageable);
-    }
-
-    public List<Exam> getRunningExams() {
-        return examRepository.findAllByStatus(ExamStatus.RUNNING);
+    public Page<Exam> findExams(ExamType examType, Pageable pageable) {
+        if (examType.isPractice()) {
+            return examRepository.findAllByExamTypeAndExaminee(examType, userUtil.getUserName(), pageable);
+        } else {
+            return examRepository.findAllByExamType(examType, pageable);
+        }
     }
 
     private void checkEntrancePermission(Exam exam) {
@@ -64,11 +63,11 @@ public class ExamService {
             throw new AccessDeniedException("You can enter only in running exams");
         }
 
-        if (!ExamType.isLiveOrPractice(exam.getExamType())) {
+        if (!exam.getExamType().isLiveOrPractice()) {
             throw new AccessDeniedException("You can enter only in live or practice exams");
         }
 
-        if (ExamType.isPractice(exam.getExamType()) && !userUtil.hasEditPermission(exam)) {
+        if (exam.getExamType().isPractice() && !userUtil.hasEditPermission(exam)) {
             throw new AccessDeniedException("You do not have permission to enter this exam");
         }
     }
@@ -87,7 +86,7 @@ public class ExamService {
             throw new AccessDeniedException("Exit is only possible from a running exam!");
         }
 
-        if (!ExamType.isLiveOrPractice(exam.getExamType())) {
+        if (!exam.getExamType().isLiveOrPractice()) {
             throw new AccessDeniedException("Exit is only possible from a live or practice exam");
         }
 
@@ -103,7 +102,7 @@ public class ExamService {
 
         userExamRecordService.exit(exam);
 
-        if (ExamType.isPractice(exam.getExamType()))
+        if (exam.getExamType().isPractice())
             resultService.updateMark(exam, userUtil.getUserName());
     }
 }

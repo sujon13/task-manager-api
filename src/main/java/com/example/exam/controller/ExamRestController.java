@@ -1,5 +1,6 @@
 package com.example.exam.controller;
 
+import com.example.exam.enums.ExamType;
 import com.example.exam.model.*;
 import com.example.exam.service.ExamAddService;
 import com.example.exam.service.ExamService;
@@ -66,9 +67,10 @@ public class ExamRestController {
 
     @GetMapping("")
     public Page<Exam> getExams(
+            @RequestParam ExamType examType,
             @PageableDefault(page = 0, size = 10, sort = "createdAt", direction = Sort.Direction.DESC) final Pageable pageable) {
 
-        return examService.findExams(pageable);
+        return examService.findExams(examType, pageable);
     }
 
     @PostMapping("/{id}/enter")

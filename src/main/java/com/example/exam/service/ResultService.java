@@ -91,7 +91,7 @@ public class ResultService {
     }
 
     public void updateMarkAndMeritPosition(Exam exam) {
-        if (ExamType.isPractice(exam.getExamType())) {
+        if (exam.getExamType().isPractice()) {
             handlePracticeExam(exam);
             return;
         }

@@ -1,6 +1,5 @@
 package com.example.exam.repository;
 
-import com.example.exam.enums.ExamStatus;
 import com.example.exam.enums.ExamType;
 import com.example.exam.model.Exam;
 import com.example.exception.NotFoundException;
@@ -15,9 +14,9 @@ import java.util.List;
 public interface ExamRepository extends JpaRepository<Exam, Integer> {
     Page<Exam> findAll(Pageable pageable);
 
+    Page<Exam> findAllByExamType(ExamType examType, Pageable pageable);
+    Page<Exam> findAllByExamTypeAndExaminee(ExamType examType, String examinee, Pageable pageable);
     List<Exam> findAllByExamTypeIn(List<ExamType> examTypes);
-
-    List<Exam> findAllByStatus(ExamStatus status);
 
     default Exam getExam(int id) {
         return findById(id)

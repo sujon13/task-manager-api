@@ -67,7 +67,7 @@ public class ExamUpdateService {
     }
 
     private void checkCancelPermission(final Exam exam) {
-        if (!ExamType.isLiveOrPractice(exam.getExamType())) {
+        if (!exam.getExamType().isLiveOrPractice()) {
             throw new AccessDeniedException("Only live and practice exams can be cancelled!");
         }
 

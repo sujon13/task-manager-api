@@ -39,4 +39,8 @@ public class ExamStatusService {
         Exam exam = examRepository.getExam(examId);
         return isExamRunning(exam);
     }
+
+    public boolean hasExamNotStarted(final Exam exam) {
+        return ExamStatus.NOT_SCHEDULED.equals(exam.getStatus()) || ExamStatus.NOT_STARTED.equals(exam.getStatus());
+    }
 }

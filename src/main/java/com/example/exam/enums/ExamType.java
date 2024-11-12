@@ -30,11 +30,16 @@ public enum ExamType {
         return value == null ? null : mapByValue.get(value);
     }
 
-    public static boolean isLiveOrPractice(ExamType examType) {
-        return examType == LIVE || examType == PRACTICE;
+    public boolean isPractice() {
+        return this == PRACTICE;
     }
 
-    public static boolean isPractice(ExamType examType) {
-        return examType == PRACTICE;
+    public boolean isLive() {
+        return this == LIVE;
     }
+
+    public boolean isLiveOrPractice() {
+        return isLive() || isPractice();
+    }
+
 }

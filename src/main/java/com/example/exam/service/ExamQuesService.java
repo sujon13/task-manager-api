@@ -156,10 +156,15 @@ public class ExamQuesService {
     }
 
     private void checkExamQuesViewPermission(final Exam exam) {
+        if (!exam.getExamType().isLiveOrPractice())
+            return;
+
         if (examStatusService.isExamRunning(exam)) {
             if (!userUtil.hasFetchPermission(exam) && !userExamRecordService.hasUserEnteredTheExam(exam.getId())) {
                 throw new AccessDeniedException("You do not have permission to view this exam question");
             }
+        } else if (examStatusService.hasExamNotStarted(exam)) {
+            throw new AccessDeniedException("This exam has not started yet");
         }
     }
 

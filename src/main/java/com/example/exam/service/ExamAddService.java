@@ -105,11 +105,11 @@ public class ExamAddService {
     }
 
     private void checkClonedExamSecurity(ExamType clonedExamType) {
-        if (ExamType.isPractice(clonedExamType)) {
+        if (clonedExamType.isPractice()) {
             if (!userUtil.hasAnyRole("USER")) {
                 throw new AccessDeniedException("Only users can create practice exams");
             }
-        } else if (ExamType.LIVE.equals(clonedExamType)) {
+        } else if (clonedExamType.isLive()) {
             if (!userUtil.hasAnyRole("EXAMINER", "ADMIN")) {
                 throw new AccessDeniedException("Only admins or examiners can create live exams");
             }

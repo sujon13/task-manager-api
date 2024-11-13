@@ -14,7 +14,7 @@ import org.springframework.web.bind.annotation.*;
 @Slf4j
 @RequiredArgsConstructor
 @RequestMapping("/api/v1/likes")
-public class LikeRestController {
+public class LikeController {
     private final LikeService likeService;
 
     @GetMapping("")

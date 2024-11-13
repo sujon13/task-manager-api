@@ -23,7 +23,7 @@ import java.util.List;
 @Slf4j
 @RequiredArgsConstructor
 @RequestMapping("/api/v1/exams")
-public class ExamQuesRestController {
+public class ExamQuesController {
     private final ExamQuesService examQuesService;
     private final ExamQuesValidationService validationService;
 

@@ -43,6 +43,9 @@ public class Question extends Auditable {
     @Convert(converter = QuesVersionConverter.class)
     private QuestionVersion version = QuestionVersion.ENGLISH;
 
+    @Column(name = "topic_id")
+    private Integer topicId;
+
     @Column(name = "question_en", length = 1024)
     private String questionEn;
 

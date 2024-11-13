@@ -16,12 +16,12 @@ import org.springframework.web.bind.annotation.*;
 @Slf4j
 @RequiredArgsConstructor
 @RequestMapping("/api/v1/questions")
-public class QuesRestController {
+public class QuesController {
     private final QuestionService questionService;
 
     @PostMapping("")
     public Question createQuestion(@Valid @RequestBody QuestionRequest request) {
-        return questionService.creteQuestion(request);
+        return questionService.createQuestion(request);
     }
 
     @GetMapping("/{id}")

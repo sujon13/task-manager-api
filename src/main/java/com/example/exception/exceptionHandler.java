@@ -1,6 +1,7 @@
 package com.example.exception;
 
 import lombok.extern.slf4j.Slf4j;
+import org.apache.coyote.BadRequestException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.AuthenticationException;
@@ -32,11 +33,21 @@ public class exceptionHandler {
                 errors.put(objectName, errorMessage);
             }
         });
-        return new ResponseEntity<>(errors, HttpStatus.BAD_REQUEST);
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(errors);
+    }
+
+    @ExceptionHandler(BadRequestException.class)
+    public ResponseEntity<String> handleBadRequestException(BadRequestException ex) {
+        log.error(ex.getMessage());
+        // Customize the response as needed
+        return ResponseEntity
+                .status(HttpStatus.BAD_REQUEST)
+                .body(ex.getMessage());
     }
 
     @ExceptionHandler(AuthenticationException.class)
     public ResponseEntity<String> handleAuthenticationException(AuthenticationException ex) {
+        log.error(ex.getMessage());
         // Customize the response as needed
         return ResponseEntity
                 .status(HttpStatus.UNAUTHORIZED)

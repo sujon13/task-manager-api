@@ -40,6 +40,10 @@ public class SecurityConfig {
                         .requestMatchers(HttpMethod.PATCH, PREFIX + "/questions/**").hasAnyRole("USER")
                         .requestMatchers(HttpMethod.PUT, PREFIX + "/questions/**").hasAnyRole("QUESTIONER", "ADMIN")
 
+                        .requestMatchers(HttpMethod.POST, PREFIX + "/topics").hasAnyRole("QUESTIONER", "ADMIN")
+                        .requestMatchers(HttpMethod.PUT, PREFIX + "/topics/*").hasRole( "ADMIN")
+                        .requestMatchers(HttpMethod.DELETE, PREFIX + "/topics/*").hasRole( "ADMIN")
+
                         .requestMatchers(HttpMethod.POST, PREFIX + "/exams").hasAnyRole("EXAMINER", "ADMIN")
                         .requestMatchers(HttpMethod.POST, PREFIX + "/exams/*/clone")
                             .hasAnyRole("EXAMINER", "ADMIN", "USER")

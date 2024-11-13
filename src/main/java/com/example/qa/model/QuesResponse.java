@@ -19,6 +19,7 @@ public class QuesResponse extends Auditable {
     private QuesTypeEnum quesType;
     private String questionerUserName;
     private QuestionVersion version;
+    private Topic topic;
     private String questionEn;
     private String questionBn;
     private Integer mcqAns;

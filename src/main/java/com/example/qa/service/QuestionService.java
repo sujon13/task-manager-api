@@ -14,7 +14,11 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
+import java.util.Set;
+import java.util.function.Function;
+import java.util.stream.Collectors;
 
 @Service
 @Slf4j
@@ -24,6 +28,7 @@ public class QuestionService {
     private final QuestionRepository questionRepository;
     private final OptionService optionService;
     private final LikeService likeService;
+    private final TopicService topicService;
     private final UserUtil userUtil;
 
 
@@ -34,6 +39,7 @@ public class QuestionService {
         question.setQuesType(request.getQuesType());
         question.setQuestionerUserName(userUtil.getUserName()); //  need to update
         question.setVersion(request.getVersion());
+        question.setTopicId(request.getTopicId());
         question.setQuestionEn(request.getQuestionEn());
         question.setQuestionBn(request.getQuestionBn());
         question.setMcqAns(request.getMcqAns()); // 1 (a) 2 (b) (1-5)
@@ -46,12 +52,12 @@ public class QuestionService {
         subQuestionRequests
                 .forEach(subQuesRequest -> {
                     subQuesRequest.setParentId(parentId);
-                    creteQuestion(subQuesRequest);
+                    createQuestion(subQuesRequest);
                 });
     }
 
     @Transactional
-    public Question creteQuestion(QuestionRequest request) {
+    public Question createQuestion(QuestionRequest request) {
         Question question = buildQuestion(request);
         try {
             questionRepository.save(question);
@@ -79,9 +85,11 @@ public class QuestionService {
                 .orElseThrow(() -> new NotFoundException("Question not found with id " + id));
     }
 
-    private QuesResponse createResponse(Question question) {
+    private QuesResponse createResponse(Question question, Topic topic) {
         QuesResponse quesResponse = new QuesResponse();
         BeanUtils.copyProperties(question, quesResponse);
+
+        quesResponse.setTopic(topic);
 
         if (QuesTypeEnum.MCQ.equals(question.getQuesType())) {
             quesResponse.setOptionResponses(optionService.getOptionResponsesByQuestionId(quesResponse.getId()));
@@ -95,15 +103,32 @@ public class QuestionService {
         return quesResponse;
     }
 
+    private QuesResponse createResponse(Question question) {
+        return createResponse(question, topicService.findById(question.getTopicId()).orElse(null));
+    }
+
     public QuesResponse getQuesResponseById(int id) {
         Question question = getQuestion(id);
         return createResponse(question);
     }
 
-    public List<QuesResponse> getQuesResponsesByIds(List<Integer> ids) {
-        return questionRepository.findAllById(ids)
+    private Map<Integer, Topic> getTopicIdToTopicMap(List<Question> questions) {
+        Set<Integer> topicIds = questions.stream()
+                .map(Question::getTopicId)
+                .collect(Collectors.toUnmodifiableSet());
+
+        return topicService.findAllByIds(topicIds)
                 .stream()
-                .map(this::createResponse)
+                .collect(Collectors.toMap(Topic::getId, Function.identity()));
+    }
+
+    public List<QuesResponse> getQuesResponsesByIds(List<Integer> ids) {
+        List<Question> questions = findAllByIds(ids);
+        Map<Integer, Topic> topicIdToTopicMap = getTopicIdToTopicMap(questions);
+
+        return findAllByIds(ids)
+                .stream()
+                .map(question -> createResponse(question, topicIdToTopicMap.get(question.getTopicId())))
                 .toList();
     }
 
@@ -114,6 +139,8 @@ public class QuestionService {
             question.setSerial(request.getSerial());
         if (request.getVersion() != null)
             question.setVersion(request.getVersion());
+        // should we update topic?
+
         if (request.getQuestionEn() != null)
             question.setQuestionEn(request.getQuestionEn());
         if (request.getQuestionBn() != null)

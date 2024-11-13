@@ -24,6 +24,7 @@ public class QuestionRequest {
     @Builder.Default
     private QuestionVersion version = QuestionVersion.ENGLISH;
 
+    private Integer topicId;
     @Size(max = 1024)
     private String questionEn;
     @Size(max = 512)

@@ -19,7 +19,7 @@ import org.springframework.web.bind.annotation.*;
 @Slf4j
 @RequiredArgsConstructor
 @RequestMapping("/api/v1/comments")
-public class CommentRestController {
+public class CommentController {
     private final CommentService commentService;
 
     @GetMapping("/hello")

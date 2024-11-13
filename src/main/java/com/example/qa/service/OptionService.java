@@ -74,11 +74,22 @@ public class OptionService {
         return optionRepository.findAllByQuestionId(questionId);
     }
 
+    public List<Option> findByQuestionIds(List<Integer> questionIds) {
+        return optionRepository.findAllByQuestionIdIn(questionIds);
+    }
+
     public List<OptionResponse> getOptionResponsesByQuestionId(int questionId) {
         List<Option> options = findByQuestionId(questionId);
         return options.stream()
                 .map(this::createOptionResponse)
                 .toList();
+    }
+
+    public Map<Integer, List<OptionResponse>> getQuesIdToOptionResponesMap(List<Integer> questionIds) {
+        return findByQuestionIds(questionIds)
+                .stream()
+                .map(this::createOptionResponse)
+                .collect(Collectors.groupingBy(OptionResponse::getQuestionId));
     }
 
     private Option editOption(OptionRequest request, Option option) {

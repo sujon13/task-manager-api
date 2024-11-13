@@ -9,6 +9,9 @@ import com.example.qa.repository.QuestionRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.BeanUtils;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.Pageable;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -85,14 +88,14 @@ public class QuestionService {
                 .orElseThrow(() -> new NotFoundException("Question not found with id " + id));
     }
 
-    private QuesResponse createResponse(Question question, Topic topic) {
+    private QuesResponse createResponse(Question question, Topic topic, List<OptionResponse> optionResponses) {
         QuesResponse quesResponse = new QuesResponse();
         BeanUtils.copyProperties(question, quesResponse);
 
         quesResponse.setTopic(topic);
 
         if (QuesTypeEnum.MCQ.equals(question.getQuesType())) {
-            quesResponse.setOptionResponses(optionService.getOptionResponsesByQuestionId(quesResponse.getId()));
+            quesResponse.setOptionResponses(optionResponses);
         } else {
             List<QuesResponse> subQuesResponses = questionRepository.findAllByParentId(question.getId())
                     .stream()
@@ -104,7 +107,9 @@ public class QuestionService {
     }
 
     private QuesResponse createResponse(Question question) {
-        return createResponse(question, topicService.findById(question.getTopicId()).orElse(null));
+        Topic topic = topicService.findById(question.getTopicId()).orElse(null);
+        List<OptionResponse> optionResponses = optionService.getOptionResponsesByQuestionId(question.getId());
+        return createResponse(question, topic, optionResponses);
     }
 
     public QuesResponse getQuesResponseById(int id) {
@@ -122,14 +127,44 @@ public class QuestionService {
                 .collect(Collectors.toMap(Topic::getId, Function.identity()));
     }
 
+    private Map<Integer, List<OptionResponse>> getQuesIdToOptionResponseMap(List<Question> questions) {
+       List<Integer> questionIds = questions.stream()
+               .map(Question::getId)
+               .toList();
+       return optionService.getQuesIdToOptionResponesMap(questionIds);
+    }
+
+    private List<QuesResponse> getQuesResponses(List<Question> questions, Map<Integer, Topic> topicIdToTopicMap) {
+        Map<Integer, List<OptionResponse>> quesIdToOptionResponsesMap = getQuesIdToOptionResponseMap(questions);
+
+        return questions
+                .stream()
+                .map(question -> createResponse(question,
+                        topicIdToTopicMap.get(question.getTopicId()),
+                        quesIdToOptionResponsesMap.get(question.getId()))
+                )
+                .toList();
+    }
+
+    private List<QuesResponse> getQuesResponses(List<Question> questions) {
+        Map<Integer, Topic> topicIdToTopicMap = getTopicIdToTopicMap(questions);
+        return getQuesResponses(questions, topicIdToTopicMap);
+    }
+
     public List<QuesResponse> getQuesResponsesByIds(List<Integer> ids) {
         List<Question> questions = findAllByIds(ids);
-        Map<Integer, Topic> topicIdToTopicMap = getTopicIdToTopicMap(questions);
+        return getQuesResponses(questions);
+    }
 
-        return findAllByIds(ids)
-                .stream()
-                .map(question -> createResponse(question, topicIdToTopicMap.get(question.getTopicId())))
-                .toList();
+    public Page<QuesResponse> getQuesResponsesByTopicId(final int topicId, Pageable pageable) {
+        List<Topic> subTopics = topicService.findAllSubTopics(topicId);
+        List<Integer> topicIds = subTopics.stream().map(Topic::getId).toList();
+        Page<Question> questions = questionRepository.findAllByTopicIdIn(topicIds, pageable);
+
+        Map<Integer, Topic> topicIdToTopicMap = subTopics.stream()
+                .collect(Collectors.toMap(Topic::getId, Function.identity()));
+        List<QuesResponse> quesResponses = getQuesResponses(questions.getContent(), topicIdToTopicMap);
+        return new PageImpl<>(quesResponses, pageable, questions.getTotalElements());
     }
 
     private Question editQuestion(Question question, QuestionEditRequest request) {

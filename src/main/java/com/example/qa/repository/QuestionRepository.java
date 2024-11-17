@@ -11,5 +11,5 @@ import java.util.List;
 @Repository
 public interface QuestionRepository extends JpaRepository<Question, Integer> {
     List<Question> findAllByParentId(int parentId);
-    Page<Question> findAllByTopicIdIn(List<Integer> topicIds, Pageable pageable);
+    Page<Question> findAllByTopicIdInAndVisibleTrue(List<Integer> topicIds, Pageable pageable);
 }

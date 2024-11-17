@@ -11,6 +11,7 @@ import org.springframework.security.access.AccessDeniedException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
@@ -72,10 +73,15 @@ public class TopicService {
     }
 
     public List<Topic> findAllSubTopics(final int id) {
-        List<Topic> subTopics = findByParentId(id);
+        List<Topic> subTopicList = new ArrayList<>();
+
+        List<Topic> directChildTopics = findByParentId(id);
+        directChildTopics.forEach(child -> subTopicList.addAll(findAllSubTopics(child.getId())));
+
         Optional<Topic> thisTopic = findById(id);
-        thisTopic.ifPresent(subTopics::add);
-        return subTopics;
+        thisTopic.ifPresent(subTopicList::add);
+
+        return subTopicList;
     }
 
     public List<Integer> findAllSubTopicsIds(final int id) {

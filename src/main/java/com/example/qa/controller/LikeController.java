@@ -19,6 +19,7 @@ public class LikeController {
 
     @GetMapping("")
     public String test() {
+        log.info("is virtual: {} id: {}", Thread.currentThread().isVirtual(), Thread.currentThread().threadId());
         return "hello";
     }
 

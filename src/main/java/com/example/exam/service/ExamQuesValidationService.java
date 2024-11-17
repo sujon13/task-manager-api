@@ -6,8 +6,6 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
-import java.util.Optional;
-
 @Service
 @Slf4j
 @RequiredArgsConstructor
@@ -21,7 +19,7 @@ public class ExamQuesValidationService {
         if (exam.getTotalQuestions() == null)
             return true;
 
-        int addedQuestionCount = examQuesService.getAddedQuesCount(examId);
+        int addedQuestionCount = examQuesService.getCurrentQuesCount(examId);
         return addedQuestionCount + newQuestionCount <= exam.getTotalQuestions();
     }
 }

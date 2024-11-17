@@ -32,7 +32,7 @@ public class QuestionRequest {
     private Integer mcqAns;
     @Size(max = 4096)
     private String explanation;
-    private boolean visible = true;
+    private Boolean visible;
 
     @Builder.Default
     private List<OptionRequest> optionRequests = new ArrayList<>();

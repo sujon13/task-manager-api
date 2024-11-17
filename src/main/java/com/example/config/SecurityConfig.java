@@ -34,6 +34,7 @@ public class SecurityConfig {
                         //.requestMatchers( "/password", "/api/v1/signup/", "/error").permitAll() // Public endpoints
 
                         .requestMatchers(HttpMethod.POST, PREFIX + "/likes").hasAnyRole("USER")
+                        .requestMatchers(HttpMethod.GET, PREFIX + "/likes").permitAll() // test
                         .requestMatchers(PREFIX + "/comments", PREFIX + "/comments/**").hasAnyRole("USER")
                         .requestMatchers(HttpMethod.POST, PREFIX + "/questions").hasAnyRole("QUESTIONER")
                         .requestMatchers(HttpMethod.GET, PREFIX + "/questions", PREFIX + "/questions/*").permitAll()

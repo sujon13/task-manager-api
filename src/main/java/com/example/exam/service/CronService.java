@@ -1,27 +1,33 @@
 package com.example.exam.service;
 
+import com.example.exam.model.Exam;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+
 @Component
 @RequiredArgsConstructor
 @Slf4j
 public class CronService {
-    private final ExamStatusService examStatusService;
     private final ExamService examService;
-    private final ResultService resultService;
-    private static final int PER_SECOND = 1000;
+    private final ExamCronService examCronService;
+    private static final int PER_SECOND = 10000;
 
-    @Scheduled(fixedRate = PER_SECOND)
+    @Scheduled(fixedDelay = PER_SECOND)
     public void checkAndUpdateExamStatus() {
+        //ExecutorService executor = Executors.newVirtualThreadPerTaskExecutor();
+        ExecutorService executor = Executors.newFixedThreadPool(10);
         examService.findAllLiveAndPracticeExams()
-                .forEach(exam -> {
-                    examStatusService.updateExamStatus(exam);
-                    if (examStatusService.isExamOver(exam)) {
-                        resultService.updateMarkAndMeritPosition(exam);
-                    }
+                .stream()
+                .map(Exam::getId)
+                .forEach(examId -> {
+                    executor.submit(() -> {
+                        examCronService.updateExamAndQuestions(examId);
+                    });
                 });
     }
 }

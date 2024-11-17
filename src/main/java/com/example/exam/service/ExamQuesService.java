@@ -47,7 +47,7 @@ public class ExamQuesService {
         return examQuestion;
     }
 
-    private Map<Integer, Integer> getQuestionidToAnsMap(List<ExamQuesRequest> examQuesRequests) {
+    private Map<Integer, Integer> getQuestionIdToAnsMap(List<ExamQuesRequest> examQuesRequests) {
         List<Integer> questionIds = examQuesRequests.stream()
                 .map(ExamQuesRequest::getQuestionId)
                 .toList();
@@ -58,7 +58,7 @@ public class ExamQuesService {
 
     @Transactional
     public List<ExamQuestion> createExamQuestions(List<ExamQuesRequest> examQuesRequests) {
-        Map<Integer, Integer> quesIdToAnsMap = getQuestionidToAnsMap(examQuesRequests);
+        Map<Integer, Integer> quesIdToAnsMap = getQuestionIdToAnsMap(examQuesRequests);
         List<ExamQuestion> examQuestions = examQuesRequests.stream()
                 .map(request -> buildExamQuestion(request, quesIdToAnsMap))
                 .toList();
@@ -95,24 +95,24 @@ public class ExamQuesService {
         examQuesRepository.saveAll(examQuestions);
     }
 
-    public Optional<ExamQuestion> findById(int id) {
+    public Optional<ExamQuestion> findById(final int id) {
         return examQuesRepository.findById(id);
     }
 
-    public ExamQuestion getExamQuestion(int id) {
+    public ExamQuestion getExamQuestion(final int id) {
         return findById(id)
                 .orElseThrow(() -> new NotFoundException("Exam question not found with id " + id));
     }
 
-    public Page<ExamQuestion> findAllByExamId(int examId, Pageable pageable) {
+    public Page<ExamQuestion> findAllByExamId(final int examId, Pageable pageable) {
         return examQuesRepository.findAllByExamId(examId, pageable);
     }
 
-    public List<ExamQuestion> findAllByExamId(int examId) {
+    public List<ExamQuestion> findAllByExamId(final int examId) {
         return examQuesRepository.findAllByExamId(examId);
     }
 
-    public Optional<ExamQuestion> findByExamIdAndQuestionId(int examId, int questionId) {
+    public Optional<ExamQuestion> findByExamIdAndQuestionId(final int examId, final int questionId) {
         return examQuesRepository.findByExamIdAndQuestionId(examId, questionId);
     }
 
@@ -120,11 +120,11 @@ public class ExamQuesService {
         return examQuesRepository.existsByQuestionIdAndExamId(request.getQuestionId(), request.getExamId());
     }
 
-    public int getAddedQuesCount(int examId) {
+    public int getCurrentQuesCount(final int examId) {
         return examQuesRepository.countByExamId(examId);
     }
 
-    private ExamResponse buildExamResponse(Exam exam) {
+    private ExamResponse buildExamResponse(final Exam exam) {
         return ExamResponse.builder()
                 .id(exam.getId())
                 .name(exam.getName())
@@ -146,7 +146,7 @@ public class ExamQuesService {
                 .build();
     }
 
-    public List<QuesResponse> getQuestionList(int examId, Pageable pageable) {
+    private List<QuesResponse> getQuestionList(int examId, Pageable pageable) {
         Page<ExamQuestion> examQuestions = findAllByExamId(examId, pageable);
 
         List<Integer> quesIds = examQuestions.stream()
@@ -175,6 +175,15 @@ public class ExamQuesService {
 
         List<QuesResponse> quesResponses = getQuestionList(examId, pageable);
         return buildExamQuesResponse(exam, quesResponses);
+    }
+
+    public void makeExamQuestionsVisible(final Exam exam) {
+        List<Integer> examQuestionIds = findAllByExamId(exam.getId())
+                .stream()
+                .map(ExamQuestion::getQuestionId)
+                .toList();
+
+        questionService.makeQuestionsVisible(examQuestionIds);
     }
 
 }

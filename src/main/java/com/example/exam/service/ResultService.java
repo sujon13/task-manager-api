@@ -101,6 +101,8 @@ public class ResultService {
                 .stream()
                 .map(entry -> buildResult(exam, entry.getKey(), entry.getValue()))
                 .toList();
+        if (results.isEmpty())
+            return;
 
         List<Result> modifiedResults = addMeritPosition(results);
         save(modifiedResults);

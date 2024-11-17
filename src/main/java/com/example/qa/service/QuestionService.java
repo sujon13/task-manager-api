@@ -47,7 +47,8 @@ public class QuestionService {
         question.setQuestionBn(request.getQuestionBn());
         question.setMcqAns(request.getMcqAns()); // 1 (a) 2 (b) (1-5)
         question.setExplanation(request.getExplanation());
-        question.setVisible(request.isVisible());
+        if (request.getVisible() != null)
+            question.setVisible(request.getVisible());
         return question;
     }
 
@@ -86,6 +87,10 @@ public class QuestionService {
     public Question getQuestion(int id) {
         return findById(id)
                 .orElseThrow(() -> new NotFoundException("Question not found with id " + id));
+    }
+
+    public Page<Question> findAllVisibleQuestionsByTopicIds(List<Integer> topicIds, Pageable pageable) {
+        return questionRepository.findAllByTopicIdInAndVisibleTrue(topicIds, pageable);
     }
 
     private QuesResponse createResponse(Question question, Topic topic, List<OptionResponse> optionResponses) {
@@ -159,7 +164,7 @@ public class QuestionService {
     public Page<QuesResponse> getQuesResponsesByTopicId(final int topicId, Pageable pageable) {
         List<Topic> subTopics = topicService.findAllSubTopics(topicId);
         List<Integer> topicIds = subTopics.stream().map(Topic::getId).toList();
-        Page<Question> questions = questionRepository.findAllByTopicIdIn(topicIds, pageable);
+        Page<Question> questions = findAllVisibleQuestionsByTopicIds(topicIds, pageable);
 
         Map<Integer, Topic> topicIdToTopicMap = subTopics.stream()
                 .collect(Collectors.toMap(Topic::getId, Function.identity()));
@@ -228,5 +233,10 @@ public class QuestionService {
             return Optional.empty();
         }
         return Optional.of(incrementLikeCount(id));
+    }
+
+    public void makeQuestionsVisible(List<Integer> questionIds) {
+        List<Question> questions = findAllByIds(questionIds);
+        questions.forEach(question -> question.setVisible(true));
     }
 }

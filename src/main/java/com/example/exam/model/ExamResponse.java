@@ -25,4 +25,6 @@ public class ExamResponse {
     private ExamType examType;
     private Integer totalQuestions;
     private Double totalMarks;
+    private Double marksObtained;
+    private Integer position;
 }

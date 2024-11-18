@@ -32,6 +32,7 @@ public class ExamQuesService {
     private final ExamStatusService examStatusService;
     private final UserExamRecordService userExamRecordService;
     private final SubmissionService submissionService;
+    private final ResultService resultService;
     private final UserUtil userUtil;
 
     private ExamQuestion buildExamQuestion(ExamQuesRequest request, Map<Integer, Integer> quesIdToAnsMap) {
@@ -140,6 +141,14 @@ public class ExamQuesService {
                 .build();
     }
 
+    private void addResult(ExamResponse examResponse, String examinee) {
+        resultService.findByExamId(examResponse.getId(), examinee).
+                ifPresent(result -> {
+                    examResponse.setMarksObtained(result.getMarksObtained());
+                    examResponse.setPosition(result.getPosition());
+                });
+    }
+
     private ExamQuesResponse buildExamQuesResponse(Exam exam, List<QuesResponse> questions) {
         return ExamQuesResponse.builder()
                 .examResponse(buildExamResponse(exam))
@@ -168,10 +177,6 @@ public class ExamQuesService {
                 .forEach(quesResponse -> quesResponse.setGivenAns(quesIdToGivenAnsMap.get(quesResponse.getId())));
     }
 
-    private void addSubmittedAnsToQuestionsByUser(final int examId, List<QuesResponse> quesResponses) {
-        addSubmittedAnsToQuestionsByUser(examId, userUtil.getUserName(), quesResponses);
-    }
-
     private void checkExamQuesViewPermission(final Exam exam) {
         if (!exam.getExamType().isLiveOrPractice())
             return;
@@ -194,18 +199,24 @@ public class ExamQuesService {
 
     public ExamQuesResponse getExamQuestions(final int examId, Pageable pageable) {
         final Exam exam = examRepository.getExam(examId);
+        final String examinee = userUtil.getUserName();
 
         checkExamQuesViewPermission(exam);
 
         List<QuesResponse> quesResponses = getQuestionList(examId, pageable);
         if (examStatusService.isExamRunning(exam)) {
             hideAnsDuringExam(quesResponses);
-            addSubmittedAnsToQuestionsByUser(examId, quesResponses);
+            addSubmittedAnsToQuestionsByUser(examId, examinee, quesResponses);
         } else if (examStatusService.isExamOver(exam)) {
-            addSubmittedAnsToQuestionsByUser(examId, quesResponses);
+            addSubmittedAnsToQuestionsByUser(examId, examinee, quesResponses);
         }
 
-        return buildExamQuesResponse(exam, quesResponses);
+        ExamQuesResponse examQuesResponse = buildExamQuesResponse(exam, quesResponses);
+        if (examStatusService.isExamOver(exam)) {
+            addResult(examQuesResponse.getExamResponse(), examinee);
+        }
+
+        return examQuesResponse;
     }
 
     public void makeExamQuestionsVisible(final int examId) {

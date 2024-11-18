@@ -1,6 +1,5 @@
 package com.example.exam.service;
 
-import com.example.exam.enums.ExamType;
 import com.example.exam.model.Exam;
 import com.example.exam.model.Result;
 import com.example.exam.model.SubmissionStatistics;

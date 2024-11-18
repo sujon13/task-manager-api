@@ -32,6 +32,10 @@ public class UserUtil {
         return hasAnyRole("ADMIN");
     }
 
+    public boolean isUser() {
+        return hasAnyRole("USER");
+    }
+
     public <T extends Auditable> boolean isCreator(T entity) {
         return entity.getCreatedBy().equals(getUserName());
     }

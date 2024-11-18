@@ -199,20 +199,22 @@ public class ExamQuesService {
 
     public ExamQuesResponse getExamQuestions(final int examId, Pageable pageable) {
         final Exam exam = examRepository.getExam(examId);
-        final String examinee = userUtil.getUserName();
 
         checkExamQuesViewPermission(exam);
+
+        final String examinee = userUtil.getUserName();
+        final boolean isUser = userUtil.isUser();
 
         List<QuesResponse> quesResponses = getQuestionList(examId, pageable);
         if (examStatusService.isExamRunning(exam)) {
             hideAnsDuringExam(quesResponses);
             addSubmittedAnsToQuestionsByUser(examId, examinee, quesResponses);
-        } else if (examStatusService.isExamOver(exam)) {
+        } else if (examStatusService.isExamOver(exam) && isUser) {
             addSubmittedAnsToQuestionsByUser(examId, examinee, quesResponses);
         }
 
         ExamQuesResponse examQuesResponse = buildExamQuesResponse(exam, quesResponses);
-        if (examStatusService.isExamOver(exam)) {
+        if (examStatusService.isExamOver(exam) && isUser) {
             addResult(examQuesResponse.getExamResponse(), examinee);
         }
 

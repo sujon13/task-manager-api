@@ -27,6 +27,20 @@ public class ExamStatusService {
         else exam.setStatus(ExamStatus.ENDED);
     }
 
+    public void updateExamStatus(Exam exam, ExamStatus status) {
+        exam.setStatus(status);
+    }
+
+    public ExamStatus getUpdatedExamStatus(Exam exam) {
+        if (exam.getStartTime() == null)
+            return ExamStatus.NOT_SCHEDULED;
+        else if (exam.getStartTime().isAfter(LocalDateTime.now()))
+            return ExamStatus.NOT_STARTED;
+        else if (exam.getEndTime().isAfter(LocalDateTime.now()))
+            return ExamStatus.RUNNING;
+        else return ExamStatus.ENDED;
+    }
+
     public boolean isExamOver(Exam exam) {
         return ExamStatus.ENDED.equals(exam.getStatus());
     }

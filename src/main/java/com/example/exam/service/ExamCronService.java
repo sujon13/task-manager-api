@@ -17,17 +17,17 @@ public class ExamCronService {
     private final ExamService examService;
 
     @Transactional
-    public void updateExamAndQuestions(final int examId) {
+    public void updateExamAndQuestions(final int examId, final ExamStatus updatedExamStatus) {
         Exam exam = examService.getExam(examId);
-        System.out.println("exam: " + exam.getId() + " running in virtual thread: " + Thread.currentThread());
-
         ExamStatus previousExamStatus = exam.getStatus();
-        examStatusService.updateExamStatus(exam);
+
+        log.info("New status of exam {} is {}", exam.getId(), updatedExamStatus);
+        examStatusService.updateExamStatus(exam, updatedExamStatus);
 
         if (ExamStatus.RUNNING.equals(previousExamStatus) && examStatusService.isExamOver(exam)) {
-            System.out.println("exam: " + exam.getId() + " is over");
+            log.info("exam: {} is over", exam.getId());
             resultService.updateMarkAndMeritPosition(exam);
-            examQuesService.makeExamQuestionsVisible(exam);
+            examQuesService.makeExamQuestionsVisible(exam.getId());
         }
     }
 }

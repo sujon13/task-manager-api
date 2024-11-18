@@ -42,12 +42,8 @@ public class ExamService {
                 .orElseThrow(() ->  new NotFoundException("Exam not found with id " + id));
     }
 
-    public List<Exam> findAllByExamTypeIn(List<ExamType> examTypeList) {
-        return examRepository.findAllByExamTypeIn(examTypeList);
-    }
-
-    public List<Exam> findAllLiveAndPracticeExams() {
-        return findAllByExamTypeIn(List.of(ExamType.LIVE, ExamType.PRACTICE));
+    public List<Exam> findLiveAndPracticeExams() {
+        return examRepository.findAllByExamTypeIn(List.of(ExamType.LIVE, ExamType.PRACTICE));
     }
 
     public Page<Exam> findExams(ExamType examType, Pageable pageable) {

@@ -168,7 +168,7 @@ public class ExamQuesService {
         }
     }
 
-    public ExamQuesResponse getExamQuestions(int examId, Pageable pageable) {
+    public ExamQuesResponse getExamQuestions(final int examId, Pageable pageable) {
         Exam exam = examRepository.getExam(examId);
 
         checkExamQuesViewPermission(exam);
@@ -177,8 +177,8 @@ public class ExamQuesService {
         return buildExamQuesResponse(exam, quesResponses);
     }
 
-    public void makeExamQuestionsVisible(final Exam exam) {
-        List<Integer> examQuestionIds = findAllByExamId(exam.getId())
+    public void makeExamQuestionsVisible(final int examId) {
+        List<Integer> examQuestionIds = findAllByExamId(examId)
                 .stream()
                 .map(ExamQuestion::getQuestionId)
                 .toList();

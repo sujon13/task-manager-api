@@ -30,7 +30,7 @@ public class ExamQuesController {
     @GetMapping("/{exam-id}/questions")
     public ExamQuesResponse getExamQuestions(
             @PathVariable("exam-id") final int examId,
-            @PageableDefault(page = 0, size = 10, sort = "createdAt", direction = Sort.Direction.ASC) final Pageable pageable) {
+            @PageableDefault(page = 0, size = 20, sort = "createdAt", direction = Sort.Direction.ASC) final Pageable pageable) {
 
         return examQuesService.getExamQuestions(examId, pageable);
     }

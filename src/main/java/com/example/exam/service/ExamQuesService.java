@@ -31,6 +31,7 @@ public class ExamQuesService {
     private final QuestionService questionService;
     private final ExamStatusService examStatusService;
     private final UserExamRecordService userExamRecordService;
+    private final SubmissionService submissionService;
     private final UserUtil userUtil;
 
     private ExamQuestion buildExamQuestion(ExamQuesRequest request, Map<Integer, Integer> quesIdToAnsMap) {
@@ -146,13 +147,29 @@ public class ExamQuesService {
                 .build();
     }
 
-    private List<QuesResponse> getQuestionList(int examId, Pageable pageable) {
+    private List<QuesResponse> getQuestionList(final int examId, Pageable pageable) {
         Page<ExamQuestion> examQuestions = findAllByExamId(examId, pageable);
 
         List<Integer> quesIds = examQuestions.stream()
                 .map(ExamQuestion::getQuestionId)
                 .toList();
         return questionService.getQuesResponsesByIds(quesIds);
+    }
+
+    private Map<Integer, Integer> getQuesIdToSubmittedAndMap(final int examId, final String examinee) {
+        List<Submission> submissionList = submissionService.findSubmissionsBy(examId, examinee);
+        return submissionList.stream()
+                .collect(Collectors.toMap(Submission::getQuesId, Submission::getGivenAns));
+    }
+
+    private void addSubmittedAnsToQuestionsByUser(final int examId, final String examinee, List<QuesResponse> quesResponses) {
+        Map<Integer, Integer> quesIdToGivenAnsMap = getQuesIdToSubmittedAndMap(examId, examinee);
+        quesResponses
+                .forEach(quesResponse -> quesResponse.setGivenAns(quesIdToGivenAnsMap.get(quesResponse.getId())));
+    }
+
+    private void addSubmittedAnsToQuestionsByUser(final int examId, List<QuesResponse> quesResponses) {
+        addSubmittedAnsToQuestionsByUser(examId, userUtil.getUserName(), quesResponses);
     }
 
     private void checkExamQuesViewPermission(final Exam exam) {
@@ -168,12 +185,26 @@ public class ExamQuesService {
         }
     }
 
+    private void hideAnsDuringExam(List<QuesResponse> quesResponses) {
+        quesResponses.forEach(quesResponse -> {
+            quesResponse.setExplanation(null);
+            quesResponse.setMcqAns(null);
+        });
+    }
+
     public ExamQuesResponse getExamQuestions(final int examId, Pageable pageable) {
-        Exam exam = examRepository.getExam(examId);
+        final Exam exam = examRepository.getExam(examId);
 
         checkExamQuesViewPermission(exam);
 
         List<QuesResponse> quesResponses = getQuestionList(examId, pageable);
+        if (examStatusService.isExamRunning(exam)) {
+            hideAnsDuringExam(quesResponses);
+            addSubmittedAnsToQuestionsByUser(examId, quesResponses);
+        } else if (examStatusService.isExamOver(exam)) {
+            addSubmittedAnsToQuestionsByUser(examId, quesResponses);
+        }
+
         return buildExamQuesResponse(exam, quesResponses);
     }
 

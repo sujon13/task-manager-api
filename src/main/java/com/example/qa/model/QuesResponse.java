@@ -23,6 +23,7 @@ public class QuesResponse extends Auditable {
     private String questionEn;
     private String questionBn;
     private Integer mcqAns;
+    private Integer givenAns;
     private String explanation;
     private boolean visible;
     private Integer likeCount;

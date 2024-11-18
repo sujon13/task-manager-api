@@ -5,6 +5,7 @@ import com.example.exam.model.Exam;
 import com.example.exam.model.Submission;
 import com.example.exam.model.SubmissionRequest;
 import com.example.exam.model.SubmissionStatistics;
+import com.example.exam.repository.ExamQuesRepository;
 import com.example.exam.repository.SubmissionRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -23,13 +24,13 @@ import java.util.stream.Collectors;
 public class SubmissionService {
     private final SubmissionRepository submissionRepository;
     private final UserUtil userUtil;
-    private final ExamQuesService examQuesService;
+    private final ExamQuesRepository examQuesRepository;
     private final UserExamRecordService userExamRecordService;
     private final ExamStatusService examStatusService;
 
 
     private boolean isAnsCorrect(SubmissionRequest request) {
-        return examQuesService.findByExamIdAndQuestionId(request.getExamId(), request.getQuestionId())
+        return examQuesRepository.findByExamIdAndQuestionId(request.getExamId(), request.getQuestionId())
                 .map(examQuestion -> request.getGivenAns().equals(examQuestion.getAns()))
                 .orElse(false);
     }
@@ -72,6 +73,10 @@ public class SubmissionService {
         return submission;
     }
 
+    public List<Submission> findSubmissionsBy(final int examId, final String examinee) {
+        return submissionRepository.findAllByExamIdAndExaminee(examId, examinee);
+    }
+
     private SubmissionStatistics getStatistics(Exam exam, List<Submission> submissionList) {
         int answered = submissionList.size();
         int correct = (int)submissionList.stream()
@@ -86,7 +91,7 @@ public class SubmissionService {
     }
 
     public SubmissionStatistics getStatistics(Exam exam, String examinee) {
-        List<Submission> submissionList = submissionRepository.findAllByExamIdAndExaminee(exam.getId(), examinee);
+        List<Submission> submissionList = findSubmissionsBy(exam.getId(), examinee);
         return getStatistics(exam, submissionList);
     }
 

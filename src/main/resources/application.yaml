@@ -10,15 +10,18 @@ spring:
     name: qa
   datasource:
     url: jdbc:mysql://localhost:3306/qa
-    username: root
-    password: aA1@9876
+    username: ${QA_DB_USER}
+    password: ${QA_DB_PASSWORD}
     driver-class-name: com.mysql.cj.jdbc.Driver
   jpa:
     hibernate:
       ddl-auto: update
 
 management:
-  endpoints.web.exposure.include=*
+  endpoints:
+    web:
+      exposure:
+        include: "*"
 
 logging:
   level:

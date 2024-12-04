@@ -29,4 +29,7 @@ public class ExamCloneRequest {
 
     private Integer totalQuestions;
     private Double totalMarks;
+
+    private Integer postId;
+    private Integer examTakerId;
 }

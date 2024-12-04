@@ -1,4 +1,4 @@
-package com.example.exam.model;
+package com.example.exam.entity;
 
 import com.example.qa.model.Auditable;
 import jakarta.persistence.*;

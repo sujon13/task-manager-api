@@ -1,10 +1,9 @@
 package com.example.exam.service;
 
 
-import com.example.UserUtil;
+import com.example.util.UserUtil;
 import com.example.exam.enums.ExamStatus;
-import com.example.exam.enums.ExamType;
-import com.example.exam.model.Exam;
+import com.example.exam.entity.Exam;
 import com.example.exam.model.ExamEditRequest;
 import com.example.exam.model.PrExamEditRequest;
 import lombok.RequiredArgsConstructor;
@@ -54,6 +53,11 @@ public class ExamUpdateService {
 
         if (request.getTotalMarks() != null)
             exam.setTotalMarks(request.getTotalMarks());
+
+        if (request.getPostId() != null)
+            exam.setPostId(request.getPostId());
+        if (request.getExamTakerId() != null)
+            exam.setExamTakerId(request.getExamTakerId());
     }
 
     @Transactional

@@ -1,6 +1,6 @@
 package com.example.qa.service;
 
-import com.example.UserUtil;
+import com.example.util.UserUtil;
 import com.example.exception.NotFoundException;
 import com.example.qa.enums.QuesTypeEnum;
 import com.example.qa.enums.TypeEnum;

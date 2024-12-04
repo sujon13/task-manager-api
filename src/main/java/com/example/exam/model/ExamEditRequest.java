@@ -29,4 +29,6 @@ public class ExamEditRequest {
     private ExamType examType;
     private Integer totalQuestions;
     private Double totalMarks;
+    private Integer postId;
+    private Integer examTakerId;
 }

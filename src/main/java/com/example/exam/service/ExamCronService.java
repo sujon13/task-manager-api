@@ -1,7 +1,7 @@
 package com.example.exam.service;
 
 import com.example.exam.enums.ExamStatus;
-import com.example.exam.model.Exam;
+import com.example.exam.entity.Exam;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;

@@ -1,20 +1,25 @@
 package com.example.exam.service;
 
-import com.example.UserUtil;
+import com.example.util.UserUtil;
+import com.example.exam.entity.ExamTaker;
+import com.example.exam.entity.Post;
 import com.example.exam.enums.ExamType;
-import com.example.exam.model.Exam;
+import com.example.exam.entity.Exam;
+import com.example.exam.model.ExamResponse;
 import com.example.exam.repository.ExamRepository;
 import com.example.exception.NotFoundException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
+import java.util.function.Function;
+import java.util.stream.Collectors;
 
 
 @Service
@@ -27,6 +32,8 @@ public class ExamService {
     private final UserUtil userUtil;
     private final UserExamRecordService userExamRecordService;
     private final ResultService resultService;
+    private final PostService postService;
+    private final ExamTakerService examTakerService;
 
     @Transactional
     public Exam saveExam(Exam exam) {
@@ -44,14 +51,6 @@ public class ExamService {
 
     public List<Exam> findLiveAndPracticeExams() {
         return examRepository.findAllByExamTypeIn(List.of(ExamType.LIVE, ExamType.PRACTICE));
-    }
-
-    public Page<Exam> findExams(ExamType examType, Pageable pageable) {
-        if (examType.isPractice()) {
-            return examRepository.findAllByExamTypeAndExaminee(examType, userUtil.getUserName(), pageable);
-        } else {
-            return examRepository.findAllByExamType(examType, pageable);
-        }
     }
 
     private void checkEntrancePermission(Exam exam) {
@@ -101,4 +100,74 @@ public class ExamService {
         if (exam.getExamType().isPractice())
             resultService.updateMark(exam, userUtil.getUserName());
     }
+
+    public ExamResponse buildExamResponse(final Exam exam, final Post post, final ExamTaker examTaker) {
+        return ExamResponse.builder()
+                .id(exam.getId())
+                .name(exam.getName())
+                .description(exam.getDescription())
+                .startTime(exam.getStartTime())
+                .allocatedTimeInMin(exam.getAllocatedTimeInMin())
+                .endTime(exam.getEndTime())
+                .status(exam.getStatus())
+                .examType(exam.getExamType())
+                .totalQuestions(exam.getTotalQuestions())
+                .totalMarks(exam.getTotalMarks())
+                .post(post)
+                .examTaker(examTaker)
+                .build();
+    }
+
+    public ExamResponse buildExamResponse(final Exam exam) {
+        final Post post = postService.findById(exam.getPostId()).orElse(null);
+        final ExamTaker examTaker = examTakerService.findById(exam.getExamTakerId()).orElse(null);
+        return buildExamResponse(exam, post, examTaker);
+    }
+
+    private Map<Integer, Post> buildIdToPostMap(final List<Exam> exams) {
+        Set<Integer> postIdList = exams.stream()
+                .map(Exam::getPostId)
+                .filter(Objects::nonNull)
+                .collect(Collectors.toUnmodifiableSet());
+        return postService
+                .findAllByIds(postIdList)
+                .stream()
+                .collect(Collectors.toMap(Post::getId, Function.identity()));
+    }
+
+    private Map<Integer, ExamTaker> getIdToExamTakerMap(final List<Exam> exams) {
+        Set<Integer> examTakerIdList = exams
+                .stream()
+                .map(Exam::getExamTakerId)
+                .filter(Objects::nonNull)
+                .collect(Collectors.toUnmodifiableSet());
+        return examTakerService
+                .findAllByIds(examTakerIdList)
+                .stream()
+                .collect(Collectors.toMap(ExamTaker::getId, Function.identity()));
+
+    }
+
+    private List<ExamResponse> buildExamResponseList(final List<Exam> exams) {
+        Map<Integer, Post> idToPostMap = buildIdToPostMap(exams);
+        Map<Integer, ExamTaker> idToExamTakerMap = getIdToExamTakerMap(exams);
+        return exams.stream()
+                .map(exam -> buildExamResponse(
+                        exam,
+                        exam.getPostId() != null ? idToPostMap.get(exam.getPostId()) : null,
+                        exam.getExamTakerId() != null ?  idToExamTakerMap.get(exam.getExamTakerId()) : null)
+                )
+                .toList();
+
+    }
+
+    public Page<ExamResponse> findExams(ExamType examType, Pageable pageable) {
+        Page<Exam> examPage = examType.isPractice()
+                ? examRepository.findAllByExamTypeAndExaminee(examType, userUtil.getUserName(), pageable)
+                : examRepository.findAllByExamType(examType, pageable);
+
+        List<ExamResponse> examResponseList = buildExamResponseList(examPage.getContent());
+        return new PageImpl<>(examResponseList, pageable, examPage.getTotalElements());
+    }
+
 }

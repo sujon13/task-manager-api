@@ -3,7 +3,7 @@ package com.example.exam.controller;
 import com.example.exam.model.ExamQuesEditRequest;
 import com.example.exam.model.ExamQuesRequest;
 import com.example.exam.model.ExamQuesResponse;
-import com.example.exam.model.ExamQuestion;
+import com.example.exam.entity.ExamQuestion;
 import com.example.exam.service.ExamQuesService;
 import com.example.exam.service.ExamQuesValidationService;
 import jakarta.validation.Valid;

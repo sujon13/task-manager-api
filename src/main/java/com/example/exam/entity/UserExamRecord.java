@@ -1,4 +1,4 @@
-package com.example.exam.model;
+package com.example.exam.entity;
 
 import com.example.exam.converter.UserExamStatusConverter;
 import com.example.exam.enums.UserExamStatus;

@@ -1,0 +1,31 @@
+package com.example.exam.entity;
+
+import com.example.qa.model.Auditable;
+import jakarta.persistence.*;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
+
+
+@Setter
+@Getter
+@Entity
+@Table(name = "exam_takers")
+@NoArgsConstructor
+@AllArgsConstructor
+public class ExamTaker extends Auditable {
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "id")
+    private Integer id;
+
+    @Column(name = "eng_name")
+    private String engName;
+
+    @Column(name = "bng_name")
+    private String bngName;
+
+    @Column(name = "description", length = 512)
+    private String description;
+}

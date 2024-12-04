@@ -1,11 +1,11 @@
 package com.example.exam.service;
 
-import com.example.UserUtil;
+import com.example.util.UserUtil;
 import com.example.exam.enums.ExamType;
-import com.example.exam.model.Exam;
+import com.example.exam.entity.Exam;
 import com.example.exam.model.ExamAddRequest;
 import com.example.exam.model.ExamCloneRequest;
-import com.example.exam.model.ExamQuestion;
+import com.example.exam.entity.ExamQuestion;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.BeanUtils;
@@ -58,6 +58,9 @@ public class ExamAddService {
 
         exam.setTotalQuestions(request.getTotalQuestions());
         exam.setTotalMarks(request.getTotalMarks());
+
+        exam.setPostId(request.getPostId());
+        exam.setExamTakerId(request.getExamTakerId());
         return exam;
     }
 
@@ -90,6 +93,10 @@ public class ExamAddService {
         if (ExamType.PRACTICE.equals(exam.getExamType())) {
             exam.setExaminee(userUtil.getUserName());
         }
+
+        exam.setPostId(cloneRequest.getPostId());
+        exam.setExamTakerId(cloneRequest.getExamTakerId());
+
         return exam;
     }
 

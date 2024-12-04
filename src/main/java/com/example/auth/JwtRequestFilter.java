@@ -1,12 +1,17 @@
 package com.example.auth;
 
+import com.example.config.SecurityConfig;
+import com.example.util.Constants;
 import io.jsonwebtoken.ExpiredJwtException;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
+import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpMethod;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -19,6 +24,7 @@ import java.util.List;
 
 @RequiredArgsConstructor
 @Component
+@Slf4j
 public class JwtRequestFilter extends OncePerRequestFilter {
 
     private final JwtUtil jwtUtil;
@@ -30,11 +36,42 @@ public class JwtRequestFilter extends OncePerRequestFilter {
         } else return null;
     }
 
+    private String extractJwtTokenFromCookie(HttpServletRequest request) {
+        Cookie[] cookies = request.getCookies();
+        if (cookies != null) {
+            for (Cookie cookie : cookies) {
+                if (Constants.ACCESS_TOKEN.equals(cookie.getName())) {
+                    return cookie.getValue();
+                }
+            }
+        }
+        return null;
+    }
+
+    private boolean isPublicEndpoint(final HttpServletRequest request) {
+        final String requestPath = request.getRequestURI();
+        return SecurityConfig.getPublicEndpoints()
+                .stream()
+                .anyMatch(pattern -> requestPath.matches(pattern.replace("**", ".*")) &&
+                        HttpMethod.GET.matches(request.getMethod())
+                );
+    }
+
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain chain)
             throws ServletException, IOException {
 
-        final String jwt = extractJwtToken(request);
+        if (isPublicEndpoint(request)) {
+            // Skip token validation for public endpoints
+            chain.doFilter(request, response);
+            return;
+        }
+
+        String jwt = extractJwtToken(request);
+        if (jwt == null) {
+            log.info("Token found from the cookie");
+            jwt = extractJwtTokenFromCookie(request);
+        }
 
         String username = null;
 

@@ -1,9 +1,14 @@
 package com.example.exam.service;
 
-import com.example.UserUtil;
-import com.example.exam.model.*;
+import com.example.util.UserUtil;
+import com.example.exam.entity.Exam;
+import com.example.exam.entity.ExamQuestion;
+import com.example.exam.entity.Submission;
+import com.example.exam.model.ExamQuesEditRequest;
+import com.example.exam.model.ExamQuesRequest;
+import com.example.exam.model.ExamQuesResponse;
+import com.example.exam.model.ExamResponse;
 import com.example.exam.repository.ExamQuesRepository;
-import com.example.exam.repository.ExamRepository;
 import com.example.exception.NotFoundException;
 import com.example.qa.model.QuesResponse;
 import com.example.qa.model.Question;
@@ -27,7 +32,7 @@ import java.util.stream.Collectors;
 @Transactional(readOnly = true)
 public class ExamQuesService {
     private final ExamQuesRepository examQuesRepository;
-    private final ExamRepository examRepository;
+    private final ExamService examService;
     private final QuestionService questionService;
     private final ExamStatusService examStatusService;
     private final UserExamRecordService userExamRecordService;
@@ -122,23 +127,9 @@ public class ExamQuesService {
         return examQuesRepository.existsByQuestionIdAndExamId(request.getQuestionId(), request.getExamId());
     }
 
+
     public int getCurrentQuesCount(final int examId) {
         return examQuesRepository.countByExamId(examId);
-    }
-
-    private ExamResponse buildExamResponse(final Exam exam) {
-        return ExamResponse.builder()
-                .id(exam.getId())
-                .name(exam.getName())
-                .description(exam.getDescription())
-                .startTime(exam.getStartTime())
-                .allocatedTimeInMin(exam.getAllocatedTimeInMin())
-                .endTime(exam.getEndTime())
-                .status(exam.getStatus())
-                .examType(exam.getExamType())
-                .totalQuestions(exam.getTotalQuestions())
-                .totalMarks(exam.getTotalMarks())
-                .build();
     }
 
     private void addResult(ExamResponse examResponse, String examinee) {
@@ -151,7 +142,7 @@ public class ExamQuesService {
 
     private ExamQuesResponse buildExamQuesResponse(Exam exam, List<QuesResponse> questions) {
         return ExamQuesResponse.builder()
-                .examResponse(buildExamResponse(exam))
+                .examResponse(examService.buildExamResponse(exam))
                 .questions(questions)
                 .build();
     }
@@ -198,7 +189,7 @@ public class ExamQuesService {
     }
 
     public ExamQuesResponse getExamQuestions(final int examId, Pageable pageable) {
-        final Exam exam = examRepository.getExam(examId);
+        final Exam exam = examService.getExam(examId);
 
         checkExamQuesViewPermission(exam);
 

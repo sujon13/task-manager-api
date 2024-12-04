@@ -22,11 +22,6 @@ import org.springframework.web.bind.annotation.*;
 public class CommentController {
     private final CommentService commentService;
 
-    @GetMapping("/hello")
-    public ResponseEntity<String> hello() {
-        return ResponseEntity.ok("sujon");
-    }
-
     @PostMapping("")
     public ResponseEntity<Comment> addComment(@Valid @RequestBody final CommentRequest request) {
         try {

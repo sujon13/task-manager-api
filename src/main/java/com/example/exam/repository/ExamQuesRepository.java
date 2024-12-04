@@ -1,6 +1,6 @@
 package com.example.exam.repository;
 
-import com.example.exam.model.ExamQuestion;
+import com.example.exam.entity.ExamQuestion;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;

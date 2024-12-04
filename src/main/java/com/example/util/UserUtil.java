@@ -1,4 +1,4 @@
-package com.example;
+package com.example.util;
 
 import com.example.qa.model.Auditable;
 import lombok.extern.slf4j.Slf4j;

@@ -1,6 +1,6 @@
 package com.example.exam.repository;
 
-import com.example.exam.model.UserExamRecord;
+import com.example.exam.entity.UserExamRecord;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 

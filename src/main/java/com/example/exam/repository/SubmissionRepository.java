@@ -1,6 +1,6 @@
 package com.example.exam.repository;
 
-import com.example.exam.model.Submission;
+import com.example.exam.entity.Submission;
 import com.example.exception.NotFoundException;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;

@@ -1,9 +1,9 @@
 package com.example.exam.service;
 
-import com.example.UserUtil;
+import com.example.util.UserUtil;
 import com.example.exam.enums.UserExamStatus;
-import com.example.exam.model.Exam;
-import com.example.exam.model.UserExamRecord;
+import com.example.exam.entity.Exam;
+import com.example.exam.entity.UserExamRecord;
 import com.example.exam.repository.UserExamRecordRepository;
 import com.example.exception.NotFoundException;
 import lombok.RequiredArgsConstructor;

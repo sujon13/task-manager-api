@@ -1,4 +1,4 @@
-package com.example.exam.model;
+package com.example.exam.entity;
 
 import com.example.exam.converter.ExamStatusConverter;
 import com.example.exam.converter.ExamTypeConverter;
@@ -62,4 +62,11 @@ public class Exam extends Auditable {
 
     @Column(name = "examinee")
     private String examinee;
+
+    @Column(name = "post_id")
+    private Integer postId;
+
+    @Column(name = "exam_taker_id")
+    private Integer examTakerId;
+
 }

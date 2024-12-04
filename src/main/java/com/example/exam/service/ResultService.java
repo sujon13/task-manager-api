@@ -1,7 +1,7 @@
 package com.example.exam.service;
 
-import com.example.exam.model.Exam;
-import com.example.exam.model.Result;
+import com.example.exam.entity.Exam;
+import com.example.exam.entity.Result;
 import com.example.exam.model.SubmissionStatistics;
 import com.example.exam.repository.ResultRepository;
 import lombok.RequiredArgsConstructor;

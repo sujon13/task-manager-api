@@ -1,8 +1,8 @@
 package com.example.exam.service;
 
-import com.example.UserUtil;
-import com.example.exam.model.Exam;
-import com.example.exam.model.Submission;
+import com.example.util.UserUtil;
+import com.example.exam.entity.Exam;
+import com.example.exam.entity.Submission;
 import com.example.exam.model.SubmissionRequest;
 import com.example.exam.model.SubmissionStatistics;
 import com.example.exam.repository.ExamQuesRepository;

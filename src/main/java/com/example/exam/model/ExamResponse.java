@@ -1,5 +1,7 @@
 package com.example.exam.model;
 
+import com.example.exam.entity.ExamTaker;
+import com.example.exam.entity.Post;
 import com.example.exam.enums.ExamStatus;
 import com.example.exam.enums.ExamType;
 import com.fasterxml.jackson.annotation.JsonFormat;
@@ -27,4 +29,6 @@ public class ExamResponse {
     private Double totalMarks;
     private Double marksObtained;
     private Integer position;
+    private Post post;
+    private ExamTaker examTaker;
 }

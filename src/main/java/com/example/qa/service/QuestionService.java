@@ -16,10 +16,7 @@ import org.springframework.security.access.AccessDeniedException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
-import java.util.Set;
+import java.util.*;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
@@ -125,6 +122,7 @@ public class QuestionService {
     private Map<Integer, Topic> getTopicIdToTopicMap(List<Question> questions) {
         Set<Integer> topicIds = questions.stream()
                 .map(Question::getTopicId)
+                .filter(Objects::nonNull)
                 .collect(Collectors.toUnmodifiableSet());
 
         return topicService.findAllByIds(topicIds)

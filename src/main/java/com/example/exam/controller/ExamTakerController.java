@@ -6,6 +6,10 @@ import com.example.exam.service.ExamTakerService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -31,8 +35,10 @@ public class ExamTakerController {
     }
 
     @GetMapping("")
-    public List<ExamTaker> getAllExamTakers() {
-        return ExamTakerService.findAll();
+    public Page<ExamTaker> getAllExamTakers(
+            @PageableDefault(page = 0, size = 10, sort = "createdAt", direction = Sort.Direction.DESC) final Pageable pageable)
+    {
+        return ExamTakerService.findAll(pageable);
     }
 
     @GetMapping("/{id}")

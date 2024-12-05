@@ -8,6 +8,8 @@ import com.example.exception.NotFoundException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.BeanUtils;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -52,8 +54,8 @@ public class ExamTakerService {
         return ExamTakerRepository.findAllById(ids);
     }
 
-    public List<ExamTaker> findAll() {
-        return ExamTakerRepository.findAll();
+    public Page<ExamTaker> findAll(Pageable pageable) {
+        return ExamTakerRepository.findAll(pageable);
     }
 
     private void editExamTaker(ExamTaker examTaker, ExamTakerRequest examTakerRequest) {

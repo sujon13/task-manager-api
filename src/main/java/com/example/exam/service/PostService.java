@@ -8,6 +8,8 @@ import com.example.exception.NotFoundException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.BeanUtils;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -52,8 +54,8 @@ public class PostService {
         return postRepository.findAllById(ids);
     }
 
-    public List<Post> findAllPosts() {
-        return postRepository.findAll();
+    public Page<Post> findAllPosts(Pageable pageable) {
+        return postRepository.findAll(pageable);
     }
 
     private void editPost(Post post, PostRequest postRequest) {

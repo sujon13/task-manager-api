@@ -14,8 +14,6 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.List;
-
 @RestController
 @Slf4j
 @RequiredArgsConstructor
@@ -49,5 +47,11 @@ public class PostController {
     @PutMapping("/{id}")
     public Post updatePost(@PathVariable final int id, @Valid @RequestBody final PostRequest request) {
         return postService.editPost(id, request);
+    }
+
+    @DeleteMapping("/{id}")
+    public ResponseEntity<Void> deletePost(@PathVariable final int id) {
+        postService.deletePost(id);
+        return ResponseEntity.noContent().build();
     }
 }

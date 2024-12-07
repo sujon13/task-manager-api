@@ -82,4 +82,9 @@ public class PostService {
         editPost(post, postRequest);
         return post;
     }
+
+    @Transactional
+    public void deletePost(final int id) {
+        postRepository.deleteById(id);
+    }
 }

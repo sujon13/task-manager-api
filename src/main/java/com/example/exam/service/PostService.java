@@ -1,18 +1,21 @@
 package com.example.exam.service;
 
-import com.example.util.UserUtil;
 import com.example.exam.entity.Post;
 import com.example.exam.model.PostRequest;
 import com.example.exam.repository.PostRepository;
+import com.example.exam.specification.PostSpecification;
 import com.example.exception.NotFoundException;
+import com.example.util.UserUtil;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.BeanUtils;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.StringUtils;
 
 import java.util.Collection;
 import java.util.List;
@@ -54,8 +57,9 @@ public class PostService {
         return postRepository.findAllById(ids);
     }
 
-    public Page<Post> findAllPosts(Pageable pageable) {
-        return postRepository.findAll(pageable);
+    public Page<Post> findAllPosts(PostRequest request, Pageable pageable) {
+        Specification<Post> postSpecification = PostSpecification.buildSpecification(request);
+        return postRepository.findAll(postSpecification, pageable);
     }
 
     private void editPost(Post post, PostRequest postRequest) {

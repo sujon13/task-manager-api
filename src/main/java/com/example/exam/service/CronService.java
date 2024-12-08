@@ -17,7 +17,7 @@ public class CronService {
     private final ExamStatusService examStatusService;
     private static final int PER_SECOND = 10000;
 
-    @Scheduled(fixedDelay = PER_SECOND)
+    //@Scheduled(fixedDelay = PER_SECOND)
     public void checkAndUpdateExamStatus() {
         log.debug("{} thread is checking exam status at {}", Thread.currentThread().getName(), new Date());
         examService.findLiveAndPracticeExams()

@@ -34,9 +34,10 @@ public class PostController {
 
     @GetMapping("")
     public Page<Post> getAllPosts(
-        @PageableDefault(page = 0, size = 10, sort = "createdAt", direction = Sort.Direction.DESC) final Pageable pageable)
+            PostRequest postRequest,
+            @PageableDefault(page = 0, size = 10, sort = "createdAt", direction = Sort.Direction.DESC) final Pageable pageable)
     {
-        return postService.findAllPosts(pageable);
+        return postService.findAllPosts(postRequest, pageable);
     }
 
     @GetMapping("/{id}")

@@ -75,6 +75,7 @@ public class SecurityConfig {
                         //.requestMatchers(HttpMethod.GET, PREFIX + "/exams/*/questions").permitAll()
                         .requestMatchers(HttpMethod.PUT, PREFIX + "/exams/*/questions/*").hasAnyRole("EXAMINER", "ADMIN")
 
+                        .requestMatchers(HttpMethod.DELETE, PREFIX + "/posts/*", PREFIX + "/exam-takers/*" ).hasRole("ADMIN")
                         .requestMatchers(PREFIX + "/posts", PREFIX + "/posts/*").hasAnyRole("EXAMINER", "ADMIN")
                         .requestMatchers(PREFIX + "/exam-takers", PREFIX + "/exam-takers/*").hasAnyRole("EXAMINER", "ADMIN")
 

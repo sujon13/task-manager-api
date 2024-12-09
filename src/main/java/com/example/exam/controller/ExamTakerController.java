@@ -14,19 +14,17 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.List;
-
 @RestController
 @Slf4j
 @RequiredArgsConstructor
 @RequestMapping("/api/v1/exam-takers")
 public class ExamTakerController {
-    private final ExamTakerService ExamTakerService;
+    private final ExamTakerService examTakerService;
 
     @PostMapping("")
     public ResponseEntity<ExamTaker> addExamTaker(@Valid @RequestBody final ExamTakerRequest request) {
         try {
-            ExamTaker ExamTaker = ExamTakerService.addExamTaker(request);
+            ExamTaker ExamTaker = examTakerService.addExamTaker(request);
             return ResponseEntity.status(HttpStatus.CREATED).body(ExamTaker);
         } catch (RuntimeException exception) {
             log.error(exception.getMessage());
@@ -36,18 +34,25 @@ public class ExamTakerController {
 
     @GetMapping("")
     public Page<ExamTaker> getAllExamTakers(
+            ExamTakerRequest examTakerRequest,
             @PageableDefault(page = 0, size = 10, sort = "createdAt", direction = Sort.Direction.DESC) final Pageable pageable)
     {
-        return ExamTakerService.findAll(pageable);
+        return examTakerService.findAll(examTakerRequest, pageable);
     }
 
     @GetMapping("/{id}")
     public ExamTaker getExamTakerById(@PathVariable final Integer id) {
-        return ExamTakerService.getExamTaker(id);
+        return examTakerService.getExamTaker(id);
     }
 
     @PutMapping("/{id}")
     public ExamTaker updateExamTaker(@PathVariable final int id, @Valid @RequestBody final ExamTakerRequest request) {
-        return ExamTakerService.editExamTaker(id, request);
+        return examTakerService.editExamTaker(id, request);
+    }
+
+    @DeleteMapping("/{id}")
+    public ResponseEntity<Void> delete(@PathVariable final int id) {
+        examTakerService.deleteById(id);
+        return ResponseEntity.noContent().build();
     }
 }

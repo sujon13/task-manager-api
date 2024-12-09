@@ -1,15 +1,17 @@
 package com.example.exam.service;
 
-import com.example.util.UserUtil;
 import com.example.exam.entity.ExamTaker;
 import com.example.exam.model.ExamTakerRequest;
 import com.example.exam.repository.ExamTakerRepository;
+import com.example.exam.specification.ExamTakerSpecification;
 import com.example.exception.NotFoundException;
+import com.example.util.UserUtil;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.BeanUtils;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -25,6 +27,7 @@ import java.util.Optional;
 public class ExamTakerService {
     private final ExamTakerRepository ExamTakerRepository;
     private final UserUtil userUtil;
+    private final ExamTakerRepository examTakerRepository;
 
     private ExamTaker buildExamTaker(ExamTakerRequest request) {
         ExamTaker examTaker = new ExamTaker();
@@ -54,8 +57,9 @@ public class ExamTakerService {
         return ExamTakerRepository.findAllById(ids);
     }
 
-    public Page<ExamTaker> findAll(Pageable pageable) {
-        return ExamTakerRepository.findAll(pageable);
+    public Page<ExamTaker> findAll(ExamTakerRequest request, Pageable pageable) {
+        Specification<ExamTaker> examtakerSpecification = ExamTakerSpecification.buildSpecification(request);
+        return ExamTakerRepository.findAll(examtakerSpecification, pageable);
     }
 
     private void editExamTaker(ExamTaker examTaker, ExamTakerRequest examTakerRequest) {
@@ -78,5 +82,10 @@ public class ExamTakerService {
         }
         editExamTaker(examTaker, ExamTakerRequest);
         return examTaker;
+    }
+
+    @Transactional
+    public void deleteById(final int id) {
+        examTakerRepository.deleteById(id);
     }
 }

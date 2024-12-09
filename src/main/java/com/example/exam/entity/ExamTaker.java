@@ -26,6 +26,6 @@ public class ExamTaker extends Auditable {
     @Column(name = "bng_name")
     private String bngName;
 
-    @Column(name = "description", length = 512)
+    @Column(name = "description", length = 1024)
     private String description;
 }

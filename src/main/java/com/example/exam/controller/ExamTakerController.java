@@ -3,6 +3,7 @@ package com.example.exam.controller;
 import com.example.exam.entity.ExamTaker;
 import com.example.exam.model.ExamTakerRequest;
 import com.example.exam.service.ExamTakerService;
+import com.example.util.Dropdown;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -13,6 +14,8 @@ import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 @RestController
 @Slf4j
@@ -54,5 +57,10 @@ public class ExamTakerController {
     public ResponseEntity<Void> delete(@PathVariable final int id) {
         examTakerService.deleteById(id);
         return ResponseEntity.noContent().build();
+    }
+
+    @GetMapping("/dropdown")
+    public List<Dropdown> getDropdown() {
+        return examTakerService.getDropdown();
     }
 }

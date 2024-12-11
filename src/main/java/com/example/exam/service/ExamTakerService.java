@@ -5,6 +5,7 @@ import com.example.exam.model.ExamTakerRequest;
 import com.example.exam.repository.ExamTakerRepository;
 import com.example.exam.specification.ExamTakerSpecification;
 import com.example.exception.NotFoundException;
+import com.example.util.Dropdown;
 import com.example.util.UserUtil;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -87,5 +88,19 @@ public class ExamTakerService {
     @Transactional
     public void deleteById(final int id) {
         examTakerRepository.deleteById(id);
+    }
+
+    private Dropdown buildDropdown(final ExamTaker examTaker) {
+        return Dropdown.builder()
+                .id(examTaker.getId())
+                .name(examTaker.getEngName() + " (" + examTaker.getBngName() + " )")
+                .build();
+    }
+
+    public List<Dropdown> getDropdown() {
+        return examTakerRepository.findAll()
+                .stream()
+                .map(this::buildDropdown)
+                .toList();
     }
 }

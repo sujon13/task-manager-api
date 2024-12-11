@@ -5,6 +5,7 @@ import com.example.exam.model.PostRequest;
 import com.example.exam.repository.PostRepository;
 import com.example.exam.specification.PostSpecification;
 import com.example.exception.NotFoundException;
+import com.example.util.Dropdown;
 import com.example.util.UserUtil;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -91,4 +92,19 @@ public class PostService {
     public void deletePost(final int id) {
         postRepository.deleteById(id);
     }
+
+    private Dropdown buildDropdown(final Post post) {
+        return Dropdown.builder()
+                .id(post.getId())
+                .name(post.getEngName() + " (" + post.getBngName() + " )")
+                .build();
+    }
+
+    public List<Dropdown> getDropdown() {
+        return postRepository.findAll()
+                .stream()
+                .map(this::buildDropdown)
+                .toList();
+    }
+
 }

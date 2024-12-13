@@ -16,6 +16,9 @@ spring:
   jpa:
     hibernate:
       ddl-auto: update
+  liquibase:
+    enabled: true
+    change-log: classpath:changelog/master.yml
 
 management:
   endpoints:

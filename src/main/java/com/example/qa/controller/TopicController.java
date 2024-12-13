@@ -9,6 +9,8 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.coyote.BadRequestException;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
+
 
 @RestController
 @Slf4j
@@ -20,6 +22,11 @@ public class TopicController {
     @PostMapping("")
     public Topic addTopic(@Valid @RequestBody final TopicRequest topicRequest) throws BadRequestException {
         return topicService.addTopic(topicRequest);
+    }
+
+    @GetMapping("")
+    public List<Topic> getAllTopics() {
+        return topicService.findAll();
     }
 
     @PutMapping("/{id}")

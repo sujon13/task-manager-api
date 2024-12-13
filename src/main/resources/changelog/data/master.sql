@@ -1,0 +1,13 @@
+insert into topics(id, eng_name, bng_name) values (1, 'English', 'ইংরেজি');
+insert into topics(id, eng_name, bng_name) values (2, 'Bangla', 'বাংলা');
+insert into topics(id, eng_name, bng_name) values (3, 'Math', 'গণিত');
+insert into topics(id, eng_name, bng_name) values (4, 'General Science', 'সাধারণ বিজ্ঞান');
+insert into topics(id, eng_name, bng_name) values (6, 'Bangladesh Affairs', 'বাংলাদেশ বিষয়াবলি');
+insert into topics(id, eng_name, bng_name) values (7, 'International Affairs', 'আন্তর্জাতিক বিষয়াবলি');
+insert into topics(id, eng_name, bng_name) values (8, 'Mental Ability', 'মানসিক দক্ষতা');
+insert into topics(id, eng_name, bng_name) values (9, 'Geography', 'ভূগোল');
+insert into topics(id, eng_name, bng_name) values (10, 'Computer', 'কম্পিউটার');
+insert into topics(id, eng_name, bng_name) values (11, 'ETHICS, VALUES & GOOD GOVERNANCE', 'নৈতিকতা, মূল্যবোধ এবং সুশাসন');
+insert into topics(id, eng_name, bng_name) values (12, 'English', 'ইংরেজি');
+insert into topics(id, eng_name, bng_name) values (13, 'English', 'ইংরেজি');
+insert into topics(id, eng_name, bng_name) values (14, 'English', 'ইংরেজি');

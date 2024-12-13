@@ -68,6 +68,10 @@ public class TopicService {
         return topicRepository.findById(id);
     }
 
+    public List<Topic> findAll() {
+        return topicRepository.findAll();
+    }
+
     public List<Topic> findAllByIds(Collection<Integer> ids) {
         return topicRepository.findAllById(ids);
     }

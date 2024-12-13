@@ -2,9 +2,7 @@ package com.example.exam.model;
 
 import com.example.exam.enums.ExamType;
 import com.fasterxml.jackson.annotation.JsonFormat;
-import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.NotNull;
-import jakarta.validation.constraints.Size;
+import jakarta.validation.constraints.*;
 import lombok.*;
 
 import java.time.LocalDateTime;
@@ -15,8 +13,6 @@ import java.time.LocalDateTime;
 @NoArgsConstructor
 @AllArgsConstructor
 public class ExamAddRequest {
-    private Integer id;
-
     @NotBlank(message = "Name cannot be empty")
     @Size(max = 127, message = "Name must be 127 characters or less")
     private String name;
@@ -24,7 +20,7 @@ public class ExamAddRequest {
     @Size(max = 255, message = "Description must be 255 characters or less")
     private String description;
 
-    @JsonFormat(pattern = "dd-MM-yyyy HH:mm")
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm")
     private LocalDateTime startTime;
 
     @Builder.Default
@@ -32,7 +28,10 @@ public class ExamAddRequest {
 
     @NotNull
     private ExamType examType;
+
+    @Positive
     private Integer totalQuestions;
+    @Positive
     private Double totalMarks;
     private Integer postId;
     private Integer examTakerId;

@@ -16,7 +16,7 @@ public class PrExamEditRequest {
     private Integer id;
 
     @NotNull
-    @JsonFormat(pattern = "dd-MM-yyyy HH:mm")
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm")
     private LocalDateTime startTime;
 
     private Integer allocatedTimeInMin;

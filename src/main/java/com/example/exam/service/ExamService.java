@@ -170,4 +170,9 @@ public class ExamService {
         return new PageImpl<>(examResponseList, pageable, examPage.getTotalElements());
     }
 
+    public ExamResponse findExam(final int examId) {
+        Exam exam = getExam(examId);
+        return buildExamResponse(exam);
+    }
+
 }

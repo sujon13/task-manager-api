@@ -18,10 +18,10 @@ public class ExamResponse {
     private int id;
     private String name;
     private String description;
-    @JsonFormat(pattern = "dd-MM-yyyy HH:mm")
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm")
     private LocalDateTime startTime;
     private int allocatedTimeInMin;
-    @JsonFormat(pattern = "dd-MM-yyyy HH:mm")
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm")
     private LocalDateTime endTime;
     private ExamStatus status;
     private ExamType examType;

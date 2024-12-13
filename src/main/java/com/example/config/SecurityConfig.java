@@ -34,6 +34,7 @@ public class SecurityConfig {
             PREFIX + "/questions",
             PREFIX + "/questions/*",
             PREFIX + "/exams",
+            PREFIX + "/exams/*",
             PREFIX + "/exams/*/questions",
             "/error"
     );

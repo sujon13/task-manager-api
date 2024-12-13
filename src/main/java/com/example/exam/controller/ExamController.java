@@ -75,6 +75,11 @@ public class ExamController {
         return examService.findExams(examType, pageable);
     }
 
+    @GetMapping("/{id}")
+    public ExamResponse getExamById(@PathVariable final int id) {
+        return examService.findExam(id);
+    }
+
     @PostMapping("/{id}/enter")
     public void enter(@PathVariable("id") final int examId) {
         examService.enterExam(examId);

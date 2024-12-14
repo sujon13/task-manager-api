@@ -54,7 +54,7 @@ public class SecurityConfig {
                         .requestMatchers(HttpMethod.POST, PREFIX + "/likes").hasAnyRole("USER")
                         //.requestMatchers(HttpMethod.GET, PREFIX + "/likes").permitAll()
                         .requestMatchers(PREFIX + "/comments", PREFIX + "/comments/**").hasAnyRole("USER")
-                        .requestMatchers(HttpMethod.POST, PREFIX + "/questions").hasAnyRole("QUESTIONER")
+                        .requestMatchers(HttpMethod.POST, PREFIX + "/questions").hasAnyRole("QUESTIONER", "ADMIN")
                         //.requestMatchers(HttpMethod.GET, PREFIX + "/questions", PREFIX + "/questions/*").permitAll()
                         .requestMatchers(HttpMethod.PATCH, PREFIX + "/questions/**").hasAnyRole("USER")
                         .requestMatchers(HttpMethod.PUT, PREFIX + "/questions/**").hasAnyRole("QUESTIONER", "ADMIN")
@@ -75,6 +75,8 @@ public class SecurityConfig {
 
                         .requestMatchers(HttpMethod.POST, PREFIX + "/exams/*/questions").hasAnyRole("EXAMINER", "ADMIN")
                         //.requestMatchers(HttpMethod.GET, PREFIX + "/exams/*/questions").permitAll()
+                        .requestMatchers(HttpMethod.GET, PREFIX + "/exams/*/questions/*")
+                            .hasAnyRole("QUESTIONER", "EXAMINER", "ADMIN")
                         .requestMatchers(HttpMethod.PUT, PREFIX + "/exams/*/questions/*").hasAnyRole("EXAMINER", "ADMIN")
 
                         .requestMatchers(HttpMethod.DELETE, PREFIX + "/posts/*", PREFIX + "/exam-takers/*" ).hasRole("ADMIN")

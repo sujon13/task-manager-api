@@ -6,6 +6,7 @@ import com.example.exam.model.ExamQuesResponse;
 import com.example.exam.entity.ExamQuestion;
 import com.example.exam.service.ExamQuesService;
 import com.example.exam.service.ExamQuesValidationService;
+import com.example.qa.model.QuesResponse;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -27,16 +28,24 @@ public class ExamQuesController {
     private final ExamQuesService examQuesService;
     private final ExamQuesValidationService validationService;
 
-    @GetMapping("/{exam-id}/questions")
+    @GetMapping("/{examId}/questions")
     public ExamQuesResponse getExamQuestions(
-            @PathVariable("exam-id") final int examId,
+            @PathVariable final int examId,
             @PageableDefault(page = 0, size = 20, sort = "createdAt", direction = Sort.Direction.ASC) final Pageable pageable) {
 
         return examQuesService.getExamQuestions(examId, pageable);
     }
 
-    @PostMapping("/{exam-id}/questions")
-    public ResponseEntity<?> addExamQuestion(@PathVariable("exam-id") final int examId,
+    @GetMapping("/{examId}/questions/{topicId}")
+    public List<QuesResponse> getExamQuestions(
+            @PathVariable final int examId,
+            @PathVariable final int topicId) {
+
+        return examQuesService.getExamQuestions(examId, topicId);
+    }
+
+    @PostMapping("/{examId}/questions")
+    public ResponseEntity<?> addExamQuestion(@PathVariable final int examId,
             @Valid @RequestBody final List<ExamQuesRequest> requestList) {
 
         if (!validationService.canQuesBeAdded(examId, requestList.size())) {
@@ -54,9 +63,9 @@ public class ExamQuesController {
         }
     }
 
-    @PutMapping("/{exam-id}/questions/{id}")
+    @PutMapping("/{examId}/questions/{id}")
     public ExamQuestion updateExamQuestion(
-            @PathVariable("exam-id") int examId,
+            @PathVariable int examId,
             @PathVariable final int id,
             @Valid @RequestBody final ExamQuesEditRequest request) {
 

@@ -212,6 +212,18 @@ public class ExamQuesService {
         return examQuesResponse;
     }
 
+    public List<QuesResponse> getExamQuestions(final int examId, final Integer topicId) {
+        List<ExamQuestion> examQuestionList = findAllByExamId(examId);
+        List<Integer> questionIds = examQuestionList.stream()
+                .map(ExamQuestion::getQuestionId)
+                .toList();
+        return questionService.getQuesResponsesByIds(questionIds)
+                .stream()
+                .filter(quesResponse -> quesResponse.getTopic() != null)
+                .filter(quesResponse -> topicId.equals(quesResponse.getTopic().getId()))
+                .toList();
+    }
+
     public void makeExamQuestionsVisible(final int examId) {
         List<Integer> examQuestionIds = findAllByExamId(examId)
                 .stream()

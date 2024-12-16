@@ -15,6 +15,7 @@ import java.util.List;
 @NoArgsConstructor
 @AllArgsConstructor
 public class QuestionRequest {
+    private Integer id;
     private Integer parentId;
 
     private Integer serial;

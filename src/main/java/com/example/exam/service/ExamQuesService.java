@@ -1,10 +1,11 @@
 package com.example.exam.service;
 
+import com.example.exam.model.ExamQuesResponseDto;
+import com.example.qa.model.Topic;
 import com.example.util.UserUtil;
 import com.example.exam.entity.Exam;
 import com.example.exam.entity.ExamQuestion;
 import com.example.exam.entity.Submission;
-import com.example.exam.model.ExamQuesEditRequest;
 import com.example.exam.model.ExamQuesRequest;
 import com.example.exam.model.ExamQuesResponse;
 import com.example.exam.model.ExamResponse;
@@ -78,7 +79,7 @@ public class ExamQuesService {
         }
     }
 
-    private void editExamQuestion(ExamQuestion examQuestion, ExamQuesEditRequest request) {
+    private void editExamQuestion(ExamQuestion examQuestion, ExamQuesRequest request) {
         if (request.getMarks() != null)
             examQuestion.setMarks(request.getMarks());
         if (request.getAns() != null)
@@ -86,7 +87,7 @@ public class ExamQuesService {
     }
 
     @Transactional
-    public ExamQuestion updateExamQuestion(final int id, ExamQuesEditRequest request) {
+    public ExamQuestion updateExamQuestion(final int id, ExamQuesRequest request) {
         ExamQuestion examQuestion = getExamQuestion(id);
 
         if (!userUtil.hasEditPermission(examQuestion)) {
@@ -212,15 +213,26 @@ public class ExamQuesService {
         return examQuesResponse;
     }
 
-    public List<QuesResponse> getExamQuestions(final int examId, final Integer topicId) {
+    public List<ExamQuesResponseDto> getExamQuestions(final int examId, final Integer topicId) {
         List<ExamQuestion> examQuestionList = findAllByExamId(examId);
+        Map<Integer, Integer> quesIdToExamQuesIdMap = examQuestionList.stream()
+                .collect(Collectors.toMap(ExamQuestion::getQuestionId, ExamQuestion::getId));
+
         List<Integer> questionIds = examQuestionList.stream()
                 .map(ExamQuestion::getQuestionId)
                 .toList();
         return questionService.getQuesResponsesByIds(questionIds)
                 .stream()
                 .filter(quesResponse -> quesResponse.getTopic() != null)
-                .filter(quesResponse -> topicId.equals(quesResponse.getTopic().getId()))
+                .filter(quesResponse -> {
+                    Topic topic = quesResponse.getTopic();
+                    return topicId.equals(topic.getId()) || topicId.equals(topic.getParentId());
+                })
+                .map(quesResponse -> ExamQuesResponseDto.builder()
+                        .id(quesIdToExamQuesIdMap.get(quesResponse.getId()))
+                        .examId(examId)
+                        .question(quesResponse)
+                        .build())
                 .toList();
     }
 
@@ -231,6 +243,11 @@ public class ExamQuesService {
                 .toList();
 
         questionService.makeQuestionsVisible(examQuestionIds);
+    }
+
+    @Transactional
+    public void deleteById(final int examQuestionId) {
+        examQuesRepository.deleteById(examQuestionId);
     }
 
 }

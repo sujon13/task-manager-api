@@ -1,12 +1,11 @@
 package com.example.exam.controller;
 
-import com.example.exam.model.ExamQuesEditRequest;
+import com.example.exam.entity.ExamQuestion;
 import com.example.exam.model.ExamQuesRequest;
 import com.example.exam.model.ExamQuesResponse;
-import com.example.exam.entity.ExamQuestion;
+import com.example.exam.model.ExamQuesResponseDto;
 import com.example.exam.service.ExamQuesService;
 import com.example.exam.service.ExamQuesValidationService;
-import com.example.qa.model.QuesResponse;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -37,7 +36,7 @@ public class ExamQuesController {
     }
 
     @GetMapping("/{examId}/questions/{topicId}")
-    public List<QuesResponse> getExamQuestions(
+    public List<ExamQuesResponseDto> getExamQuestions(
             @PathVariable final int examId,
             @PathVariable final int topicId) {
 
@@ -67,9 +66,15 @@ public class ExamQuesController {
     public ExamQuestion updateExamQuestion(
             @PathVariable int examId,
             @PathVariable final int id,
-            @Valid @RequestBody final ExamQuesEditRequest request) {
+            @Valid @RequestBody final ExamQuesRequest request) {
 
         return examQuesService.updateExamQuestion(id, request);
+    }
+
+    @DeleteMapping("/{examId}/questions/{id}")
+    public ResponseEntity<Void> deleteExamQuestion(@PathVariable final int examId, @PathVariable final int id) {
+        examQuesService.deleteById(id);
+        return ResponseEntity.noContent().build();
     }
 
 }

@@ -29,6 +29,11 @@ public class TopicController {
         return topicService.findAll();
     }
 
+    @GetMapping("/{id}/directSubTopics")
+    public List<Topic> getAllDirectSubTopics(@PathVariable final int id) {
+        return topicService.findAllDirectSubTopics(id);
+    }
+
     @PutMapping("/{id}")
     public Topic editTopic(@PathVariable final int id,
                            @Valid @RequestBody final TopicRequest topicRequest) {

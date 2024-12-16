@@ -30,8 +30,9 @@ public class QuesResponse extends Auditable {
     private Integer freqCount;
 
     @Builder.Default
-    private List<OptionResponse> optionResponses = new ArrayList<>();
+    private List<OptionResponse> options = new ArrayList<>();
 
     @Builder.Default
     private List<QuesResponse> subResponses = new ArrayList<>();
 }
+

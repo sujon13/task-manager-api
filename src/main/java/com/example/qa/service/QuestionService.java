@@ -97,7 +97,7 @@ public class QuestionService {
         quesResponse.setTopic(topic);
 
         if (QuesTypeEnum.MCQ.equals(question.getQuesType())) {
-            quesResponse.setOptionResponses(optionResponses);
+            quesResponse.setOptions(optionResponses);
         } else {
             List<QuesResponse> subQuesResponses = questionRepository.findAllByParentId(question.getId())
                     .stream()
@@ -170,14 +170,15 @@ public class QuestionService {
         return new PageImpl<>(quesResponses, pageable, questions.getTotalElements());
     }
 
-    private Question editQuestion(Question question, QuestionEditRequest request) {
+    private Question editQuestion(Question question, QuestionRequest request) {
         if (request.getParentId() != null)
             question.setParentId(request.getParentId());
         if (request.getSerial() != null)
             question.setSerial(request.getSerial());
         if (request.getVersion() != null)
             question.setVersion(request.getVersion());
-        // should we update topic?
+        if (request.getTopicId() != null)
+            question.setTopicId(request.getTopicId());
 
         if (request.getQuestionEn() != null)
             question.setQuestionEn(request.getQuestionEn());
@@ -193,7 +194,7 @@ public class QuestionService {
     }
 
     @Transactional
-    public Question editQuestion(int id, QuestionEditRequest request) {
+    public Question editQuestion(final int id, QuestionRequest request) {
         Question question = getQuestion(id);
 
         if (!userUtil.hasEditPermission(question)) {

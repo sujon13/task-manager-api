@@ -2,7 +2,6 @@ package com.example.qa.controller;
 
 import com.example.qa.model.QuesResponse;
 import com.example.qa.model.Question;
-import com.example.qa.model.QuestionEditRequest;
 import com.example.qa.model.QuestionRequest;
 import com.example.qa.service.QuestionService;
 import jakarta.validation.Valid;
@@ -43,7 +42,7 @@ public class QuesController {
 
     @PutMapping("/{id}")
     public ResponseEntity<Question> updateQuestion(
-            @PathVariable final int id, @Valid @RequestBody QuestionEditRequest request) {
+            @PathVariable final int id, @Valid @RequestBody QuestionRequest request) {
 
         return ResponseEntity.ok(questionService.editQuestion(id, request));
     }

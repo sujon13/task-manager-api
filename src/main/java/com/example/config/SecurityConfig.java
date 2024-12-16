@@ -37,6 +37,7 @@ public class SecurityConfig {
             PREFIX + "/exams/*",
             PREFIX + "/exams/*/questions",
             PREFIX + "/topics",
+            PREFIX + "/topics/*/directSubTopics",
             "/error"
     );
 
@@ -78,6 +79,7 @@ public class SecurityConfig {
                         .requestMatchers(HttpMethod.GET, PREFIX + "/exams/*/questions/*")
                             .hasAnyRole("QUESTIONER", "EXAMINER", "ADMIN")
                         .requestMatchers(HttpMethod.PUT, PREFIX + "/exams/*/questions/*").hasAnyRole("EXAMINER", "ADMIN")
+                        .requestMatchers(HttpMethod.DELETE, PREFIX + "/exams/*/questions/*").hasRole("ADMIN")
 
                         .requestMatchers(HttpMethod.DELETE, PREFIX + "/posts/*", PREFIX + "/exam-takers/*" ).hasRole("ADMIN")
                         .requestMatchers(PREFIX + "/posts", PREFIX + "/posts/*").hasAnyRole("EXAMINER", "ADMIN")

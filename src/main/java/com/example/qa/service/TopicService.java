@@ -76,6 +76,10 @@ public class TopicService {
         return topicRepository.findAllById(ids);
     }
 
+    public List<Topic> findAllDirectSubTopics(final int id) {
+        return findByParentId(id);
+    }
+
     public List<Topic> findAllSubTopics(final int id) {
         List<Topic> subTopicList = new ArrayList<>();
 

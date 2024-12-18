@@ -17,6 +17,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Map;
 
 
 @RestController
@@ -41,6 +42,11 @@ public class ExamQuesController {
             @PathVariable final int topicId) {
 
         return examQuesService.getExamQuestions(examId, topicId);
+    }
+
+    @GetMapping("/{examId}/questionCountMap")
+    public Map<Integer, Long> getTopicIdToQuestionCountMap(@PathVariable final int examId) {
+        return examQuesService.getTopicIdToQuestionCountMap(examId);
     }
 
     @PostMapping("/{examId}/questions")

@@ -30,6 +30,7 @@ public class ExamAddRequest {
     private ExamType examType;
 
     @Positive
+    @NotNull
     private Integer totalQuestions;
     @Positive
     private Double totalMarks;

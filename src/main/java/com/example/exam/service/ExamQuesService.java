@@ -236,6 +236,25 @@ public class ExamQuesService {
                 .toList();
     }
 
+    public Map<Integer, Long> getTopicIdToQuestionCountMap(final int examId) {
+        List<ExamQuestion> examQuestionList = findAllByExamId(examId);
+        List<Integer> questionIds = examQuestionList.stream()
+                .map(ExamQuestion::getQuestionId)
+                .toList();
+
+        return questionService.getQuesResponsesByIds(questionIds)
+                .stream()
+                .filter(quesResponse -> quesResponse.getTopic() != null)
+                .collect(
+                        Collectors.groupingBy(
+                                quesResponse -> quesResponse.getTopic().getParentId() != null
+                                    ? quesResponse.getTopic().getParentId()
+                                    : quesResponse.getTopic().getId(),
+                                Collectors.counting()
+                        )
+                );
+    }
+
     public void makeExamQuestionsVisible(final int examId) {
         List<Integer> examQuestionIds = findAllByExamId(examId)
                 .stream()

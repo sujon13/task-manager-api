@@ -55,7 +55,7 @@ public class Incident extends Auditable {
     @Convert(converter = FaultNatureConverter.class)
     private FaultNature faultNature = FaultNature.SOFTWARE;
 
-    // Affected Equipment
+    // Affected Equipment -> in separate table
 
     @Column(name = "summary", length = 1024)
     private String summary;

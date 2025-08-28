@@ -8,6 +8,7 @@ import jakarta.validation.constraints.Size;
 import lombok.*;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 
 @Getter
@@ -29,6 +30,7 @@ public class IncidentRequest {
     @JsonFormat(pattern = "dd-MM-yyyy HH:mm")
     private LocalDateTime reportedAt = LocalDateTime.now();
 
+    @Size(max = 64)
     private String assignedTo;
 
     @JsonFormat(pattern = "dd-MM-yyyy HH:mm")
@@ -37,6 +39,7 @@ public class IncidentRequest {
     private FaultNature faultNature = FaultNature.SOFTWARE;
 
     // Affected Equipment
+    private List<String> affectedEquipments = List.of();
 
     @Size(max = 1024)
     private String summary;
@@ -54,7 +57,7 @@ public class IncidentRequest {
     @Size(max = 2048)
     private String remarksByContractor;
 
-    private IncidentStatus status = IncidentStatus.REPORTED;
+    private IncidentStatus status;
 
     // category
     // sub-category

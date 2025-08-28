@@ -6,6 +6,7 @@ import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.*;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 @Getter
 @Setter
@@ -24,6 +25,7 @@ public class IncidentResponse {
     @JsonFormat(pattern = "dd-MM-yyyy HH:mm")
     private LocalDateTime reportedAt;
 
+    private String reportedBy;
     private String assignedTo;
 
     @JsonFormat(pattern = "dd-MM-yyyy HH:mm")
@@ -32,6 +34,7 @@ public class IncidentResponse {
     private FaultNature faultNature;
 
     // Affected Equipment
+    List<String> affectedEquipments;
 
     private String summary;
     private String description;

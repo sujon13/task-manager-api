@@ -39,6 +39,7 @@ public class SecurityConfig {
             PREFIX + "/exams/*/questionCountMap",
             PREFIX + "/topics",
             PREFIX + "/topics/*/directSubTopics",
+            PREFIX + "/incidents",
             "/error"
     );
 
@@ -85,6 +86,8 @@ public class SecurityConfig {
                         .requestMatchers(HttpMethod.DELETE, PREFIX + "/posts/*", PREFIX + "/exam-takers/*" ).hasRole("ADMIN")
                         .requestMatchers(PREFIX + "/posts", PREFIX + "/posts/*").hasAnyRole("EXAMINER", "ADMIN")
                         .requestMatchers(PREFIX + "/exam-takers", PREFIX + "/exam-takers/*").hasAnyRole("EXAMINER", "ADMIN")
+
+                        .requestMatchers(PREFIX + "/incidents", PREFIX + "/incidents/*").permitAll()
 
                         .anyRequest().authenticated()  // Secure other endpoints
                 )

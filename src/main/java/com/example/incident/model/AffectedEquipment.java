@@ -7,10 +7,12 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import org.hibernate.envers.Audited;
 
 @Setter
 @Getter
 @Entity
+@Audited
 @Table(name = "affected_equipments", indexes = {
         @Index(name = "idx_affected_equipments_incident_id", columnList = "incident_id")
 })

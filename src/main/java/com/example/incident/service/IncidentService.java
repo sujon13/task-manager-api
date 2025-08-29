@@ -99,8 +99,9 @@ public class IncidentService {
     @Transactional
     public IncidentResponse addIncident(IncidentRequest request) {
         Incident incident = createIncidentFromRequest(request);
-        affectedEquipmentService.addAffectedEquipments(incident.getId(), request.getAffectedEquipments());
         incidentRepository.save(incident);
+        affectedEquipmentService.addAffectedEquipments(incident.getId(), request.getAffectedEquipments());
+
         return buildIncidentResponse(incident);
     }
 
@@ -130,6 +131,8 @@ public class IncidentService {
     @Transactional
     public IncidentResponse updateIncident(final int id, IncidentRequest request) {
         Incident incident = findById(id);
+        userUtil.checkEditPermission(incident);
+
         updateIncident(incident, request);
         affectedEquipmentService.updateAffectedEquipments(incident.getId(), request.getAffectedEquipments());
         return buildIncidentResponse(incident);
@@ -138,6 +141,7 @@ public class IncidentService {
     @Transactional
     public IncidentResponse updateIncidentStatus(final int id, IncidentStatus status) {
         Incident incident = findById(id);
+        userUtil.checkEditPermission(incident);
 
         // here business logic to update incident status
         // incident.setStatus(status);

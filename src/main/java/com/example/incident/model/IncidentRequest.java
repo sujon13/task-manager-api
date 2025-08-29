@@ -57,7 +57,7 @@ public class IncidentRequest {
     @Size(max = 2048)
     private String remarksByContractor;
 
-    private IncidentStatus status;
+    private IncidentStatus status = IncidentStatus.REPORTED;
 
     // category
     // sub-category

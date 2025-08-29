@@ -87,8 +87,6 @@ public class SecurityConfig {
                         .requestMatchers(PREFIX + "/posts", PREFIX + "/posts/*").hasAnyRole("EXAMINER", "ADMIN")
                         .requestMatchers(PREFIX + "/exam-takers", PREFIX + "/exam-takers/*").hasAnyRole("EXAMINER", "ADMIN")
 
-                        .requestMatchers(PREFIX + "/incidents", PREFIX + "/incidents/*").permitAll()
-
                         .anyRequest().authenticated()  // Secure other endpoints
                 )
                 .exceptionHandling(exceptions -> exceptions.accessDeniedHandler(accessDeniedHandler))

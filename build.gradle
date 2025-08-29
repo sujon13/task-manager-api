@@ -35,6 +35,7 @@ dependencies {
 	runtimeOnly 'io.jsonwebtoken:jjwt-jackson:0.12.6'
 	implementation 'org.springframework.cloud:spring-cloud-starter:4.2.2'
 	implementation 'org.springframework.boot:spring-boot-starter-oauth2-client'
+    implementation 'org.hibernate.orm:hibernate-envers:6.6.26.Final'
 
 	implementation 'io.jsonwebtoken:jjwt-api:0.12.6'
 	runtimeOnly 'io.jsonwebtoken:jjwt-impl:0.12.6'

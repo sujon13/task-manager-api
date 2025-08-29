@@ -2,6 +2,7 @@ package com.example.util;
 
 import com.example.qa.model.Auditable;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
@@ -42,6 +43,12 @@ public class UserUtil {
 
     public <T extends Auditable> boolean hasEditPermission(T entity) {
         return isCreator(entity) || isAdmin();
+    }
+
+    public <T extends Auditable> void checkEditPermission(T entity) {
+        if (!hasEditPermission(entity)) {
+            throw new AccessDeniedException("You don't have permission to edit this entity");
+        }
     }
 
     public <T extends Auditable> boolean hasFetchPermission(T entity) {

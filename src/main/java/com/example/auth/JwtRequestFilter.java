@@ -3,6 +3,9 @@ package com.example.auth;
 import com.example.config.SecurityConfig;
 import com.example.util.Constants;
 import io.jsonwebtoken.ExpiredJwtException;
+import io.jsonwebtoken.MalformedJwtException;
+import io.jsonwebtoken.security.SecurityException;
+import io.jsonwebtoken.security.SignatureException;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.Cookie;
@@ -12,6 +15,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
+import org.springframework.http.MediaType;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -74,12 +78,20 @@ public class JwtRequestFilter extends OncePerRequestFilter {
         }
 
         String username = null;
-
         if (jwt != null) {
             try {
                 username = jwtUtil.extractUsername(jwt);
+            } catch (MalformedJwtException e) {
+                handleJwtException(response, "Invalid JWT Token", e.getMessage());
+            } catch (SignatureException e) {
+                handleJwtException(response, "Invalid JWT Signature", e.getMessage());
+            } catch (SecurityException e) {
+                handleJwtException(response, "Invalid JWT Security", e.getMessage());
             } catch (ExpiredJwtException e) {
-                System.out.println("JWT Token has expired");
+                handleJwtException(response, "JWT Token has expired", e.getMessage());
+            }
+            if (username == null) {
+                return;
             }
         }
 
@@ -96,5 +108,13 @@ public class JwtRequestFilter extends OncePerRequestFilter {
             }
         }
         chain.doFilter(request, response);
+    }
+
+    private void handleJwtException(HttpServletResponse response, String message, String errorMessage) throws IOException {
+        log.error(message);
+        log.error(errorMessage);
+        response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+        response.setContentType(MediaType.APPLICATION_JSON_VALUE);
+        response.getWriter().write(message);
     }
 }

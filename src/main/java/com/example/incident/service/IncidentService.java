@@ -26,6 +26,7 @@ public class IncidentService {
     private final IncidentRepository incidentRepository;
     private final AffectedEquipmentService affectedEquipmentService;
     private final ActionsTakenService actionsTakenService;
+    private final IncidentStatusTrackerService incidentStatusTrackerService;
     private final IncidentUtil incidentUtil;
     private final UserUtil userUtil;
 
@@ -37,6 +38,11 @@ public class IncidentService {
     public Incident findById(int id) {
         return incidentRepository.findById(id)
                 .orElseThrow(() -> new NotFoundException("Incident not found with id " + id));
+    }
+
+    private void save(Incident incident) {
+        incidentRepository.save(incident);
+        incidentStatusTrackerService.addIncidentStatus(incident, null, IncidentStatus.REPORTED);
     }
 
     private void addActionsTaken(IncidentResponse incidentResponse, Incident incident, List<ActionsTaken> actionsTakenList) {
@@ -119,7 +125,7 @@ public class IncidentService {
     @Transactional
     public IncidentResponse addIncident(IncidentRequest request) {
         Incident incident = createIncidentFromRequest(request);
-        incidentRepository.save(incident);
+        save(incident);
         affectedEquipmentService.addAffectedEquipments(incident.getId(), request.getAffectedEquipments());
         addActionsTaken(incident, request);
 
@@ -175,13 +181,18 @@ public class IncidentService {
         }
     }
 
+    private void updateIncidentStatus(Incident incident, IncidentUpdateRequest updateRequest) {
+        incidentStatusTrackerService.addIncidentStatus(incident, updateRequest.getStatus());
+        incident.setStatus(updateRequest.getStatus());
+    }
+
     @Transactional
     public IncidentResponse updateIncidentStatus(final int id, IncidentUpdateRequest updateRequest) {
         Incident incident = findById(id);
         incidentUtil.checkEditPermission(incident); // creator, admin or assignee
         checkStatusEditPermission(incident, updateRequest.getStatus()); // assignee can not resolve incident
 
-        incident.setStatus(updateRequest.getStatus());
+        updateIncidentStatus(incident, updateRequest);
         return buildIncidentResponse(incident);
     }
 

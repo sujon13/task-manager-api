@@ -7,11 +7,13 @@ import com.example.incident.service.IncidentService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-
-import java.util.List;
 
 
 @RestController
@@ -23,8 +25,10 @@ public class IncidentController {
 
 
     @GetMapping("")
-    public ResponseEntity<List<IncidentResponse>> getAllIncidents() {
-        List<IncidentResponse> incidentList = incidentService.getIncidents();
+    public ResponseEntity<Page<IncidentResponse>> getAllIncidents(
+            @PageableDefault(page = 0, size = 10, sort = "createdAt", direction = Sort.Direction.DESC) final Pageable pageable
+    ) {
+        Page<IncidentResponse> incidentList = incidentService.getIncidents(pageable);
         return ResponseEntity.ok(incidentList);
     }
 

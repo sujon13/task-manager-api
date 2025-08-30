@@ -1,5 +1,6 @@
 package com.example.util;
 
+import com.example.auth.CustomUserPrincipal;
 import com.example.qa.model.Auditable;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.access.AccessDeniedException;
@@ -10,12 +11,38 @@ import org.springframework.stereotype.Service;
 @Service
 @Slf4j
 public class UserUtil {
-    public String getUserName(Authentication authentication) {
-        return authentication != null ? authentication.getName() : null;
+    private Object getUserPrincipal() {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        if (authentication == null) {
+            return null;
+        }
+        return authentication.getPrincipal();
     }
 
     public String getUserName() {
-        return getUserName(SecurityContextHolder.getContext().getAuthentication());
+        Object principal = getUserPrincipal();
+        if (principal == null) {
+            return null;
+        }
+
+        if (principal instanceof CustomUserPrincipal) {
+            return ((CustomUserPrincipal) principal).getUsername();
+        } else {
+            return principal.toString();
+        }
+    }
+
+    public String getFullName() {
+        Object principal = getUserPrincipal();
+        if (principal == null) {
+            return null;
+        }
+
+        if (principal instanceof CustomUserPrincipal) {
+            return ((CustomUserPrincipal) principal).getName();
+        } else {
+            return "";
+        }
     }
 
     public boolean hasAnyRole(String... roles) {

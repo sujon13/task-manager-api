@@ -8,6 +8,9 @@ import com.example.util.UserUtil;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.BeanUtils;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.Pageable;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
@@ -82,23 +85,24 @@ public class IncidentService {
         return buildIncidentResponse(incident, affectedEquipments, actionsTakenList);
     }
 
-    private List<IncidentResponse> buildIncidentResponses(List<Incident> incidents) {
+    private Page<IncidentResponse> buildIncidentResponses(Page<Incident> incidents) {
         List<Integer> incidentIds = incidents.stream().map(Incident::getId).toList();
         Map<Integer, List<String>> affectedEquipmentMap = affectedEquipmentService.getAffectedEquipmentMap(incidentIds);
         Map<Integer, List<ActionsTaken>> actionsTakenMap = actionsTakenService.findIncidentIdToActionsTakenMap(incidentIds);
 
-        return incidents.stream()
+        List<IncidentResponse> incidentResponses = incidents.stream()
                 .map(incident -> buildIncidentResponse(
                         incident,
                         affectedEquipmentMap.getOrDefault(incident.getId(), List.of()),
                         actionsTakenMap.getOrDefault(incident.getId(), List.of()))
                 )
                 .toList();
+        return new PageImpl<>(incidentResponses, incidents.getPageable(), incidents.getTotalElements());
     }
 
-    public List<IncidentResponse> getIncidents() {
-        List<Incident> incidentList = incidentRepository.findAll();
-        return buildIncidentResponses(incidentList);
+    public Page<IncidentResponse> getIncidents(Pageable pageable) {
+        Page<Incident> incidents = incidentRepository.findAll(pageable);
+        return buildIncidentResponses(incidents);
     }
 
     public IncidentResponse getIncident(int id) {

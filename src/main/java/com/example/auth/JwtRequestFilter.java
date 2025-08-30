@@ -101,8 +101,9 @@ public class JwtRequestFilter extends OncePerRequestFilter {
 
             if (jwtUtil.validateToken(jwt, username)) {
                 List<? extends GrantedAuthority> authorities = jwtUtil.extractRoles(jwt);
+                final CustomUserPrincipal principal = jwtUtil.buildUserPrincipal(jwt, authorities);
                 UsernamePasswordAuthenticationToken authenticationToken = new UsernamePasswordAuthenticationToken(
-                        username, null, authorities);
+                        principal, null, authorities);
                 authenticationToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
                 SecurityContextHolder.getContext().setAuthentication(authenticationToken);
             }

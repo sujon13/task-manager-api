@@ -29,10 +29,6 @@ public class IncidentStatusTrackerService {
         return incidentStatusTracker;
     }
 
-    private IncidentStatusTracker buildIncidentStatus(Incident incident, IncidentStatus newStatus) {
-        return buildIncidentStatus(incident, incident.getStatus(), newStatus);
-    }
-
     @Transactional
     public void addIncidentStatus(Incident incident, IncidentStatus oldStatus, IncidentStatus newStatus) {
         IncidentStatusTracker incidentStatusTracker = buildIncidentStatus(incident, oldStatus, newStatus);

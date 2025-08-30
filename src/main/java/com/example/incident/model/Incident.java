@@ -30,7 +30,7 @@ public class Incident extends Auditable {
     private Integer id;
 
     @NotNull
-    @Column(name = "event_no", unique = true)
+    @Column(name = "event_no", unique = true, updatable = false)
     private Integer eventNo;
 
     @Column(name = "station", length = 64)

@@ -48,8 +48,10 @@ public class IncidentRequest {
     private String description;
 
     // actionTakenByScada
+    private List<ActionTakenRequest> actionsTakenByScada = List.of();
 
     // actionTakenByContractor
+    private List<ActionTakenRequest> actionsTakenByContractor = List.of();
 
     @Size(max = 2048)
     private String remarksByScada;

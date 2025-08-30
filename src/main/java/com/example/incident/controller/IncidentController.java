@@ -1,8 +1,8 @@
 package com.example.incident.controller;
 
-import com.example.incident.enums.IncidentStatus;
 import com.example.incident.model.IncidentRequest;
 import com.example.incident.model.IncidentResponse;
+import com.example.incident.model.IncidentUpdateRequest;
 import com.example.incident.service.IncidentService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -47,8 +47,9 @@ public class IncidentController {
     }
 
     @PatchMapping("/{id}/status")
-    public ResponseEntity<IncidentResponse> updateIncidentStatus(@PathVariable int id, @Valid @RequestBody IncidentStatus status) {
-        IncidentResponse incidentResponse = incidentService.updateIncidentStatus(id, status);
+    public ResponseEntity<IncidentResponse> updateIncidentStatus(@PathVariable int id,
+                                                                 @Valid @RequestBody IncidentUpdateRequest updateRequest) {
+        IncidentResponse incidentResponse = incidentService.updateIncidentStatus(id, updateRequest);
         return ResponseEntity.ok(incidentResponse);
     }
 

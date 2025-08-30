@@ -2,19 +2,19 @@ package com.example.incident.service;
 
 import com.example.exception.NotFoundException;
 import com.example.incident.enums.IncidentStatus;
-import com.example.incident.model.Incident;
-import com.example.incident.model.IncidentRequest;
-import com.example.incident.model.IncidentResponse;
+import com.example.incident.model.*;
 import com.example.incident.repository.IncidentRepository;
 import com.example.util.UserUtil;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.BeanUtils;
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 
 @Service
@@ -24,6 +24,8 @@ import java.util.Map;
 public class IncidentService {
     private final IncidentRepository incidentRepository;
     private final AffectedEquipmentService affectedEquipmentService;
+    private final ActionsTakenService actionsTakenService;
+    private final IncidentUtil incidentUtil;
     private final UserUtil userUtil;
 
 
@@ -41,47 +43,65 @@ public class IncidentService {
         incidentRepository.deleteById(id);
     }
 
-    private IncidentResponse buildIncidentResponse(Incident incident) {
+    private void addActionsTaken(IncidentResponse incidentResponse, Incident incident, List<ActionsTaken> actionsTakenList) {
+        Map<String, List<ActionTakenRequest>> actionsTakenMap =
+                actionsTakenList.stream()
+                        .collect(
+                                Collectors.groupingBy(
+                                        ActionsTaken::getTaker,
+                                        Collectors.mapping(
+                                                actionsTakenService::buildActionTakenRequest ,
+                                                Collectors.toList()
+                                        )
+                                )
+                        );
+
+        incidentResponse.setActionsTakenByScada(
+                actionsTakenMap.getOrDefault(incident.getReportedBy(), List.of())
+        );
+        incidentResponse.setActionsTakenByContractor(
+                actionsTakenMap.getOrDefault(incident.getAssignedTo(), List.of())
+        );
+    }
+
+    private IncidentResponse buildIncidentResponse(Incident incident,
+                                                   List<String> affectedEquipments, List<ActionsTaken> actionsTakenList) {
         IncidentResponse incidentResponse = new IncidentResponse();
         BeanUtils.copyProperties(incident, incidentResponse);
-        incidentResponse.setAffectedEquipments(
-               affectedEquipmentService.findAllEquipmentNamesByIncidentId(incident.getId())
-        );
+        incidentResponse.setAffectedEquipments(affectedEquipments);
+        addActionsTaken(incidentResponse, incident, actionsTakenList);
         return incidentResponse;
     }
 
-    private List<IncidentResponse> buildIncidentResponses(List<Incident> incidents) {
-        return incidents.stream()
-                .map(this::buildIncidentResponse)
-                .toList();
+    private IncidentResponse buildIncidentResponse(Incident incident) {
+        List<String> affectedEquipments = affectedEquipmentService.findAllEquipmentNamesByIncidentId(incident.getId());
+        List<ActionsTaken> actionsTakenList = actionsTakenService.findAllByIncidentId(incident.getId());
+
+        return buildIncidentResponse(incident, affectedEquipments, actionsTakenList);
     }
 
-    private void addAffectedEquipmentsToResponses(List<IncidentResponse> incidentResponses) {
-        List<Integer> incidentIds = incidentResponses.stream()
-                 .map(IncidentResponse::getId)
-                 .toList();
-         Map<Integer, List<String>> affectedEquipmentMap = affectedEquipmentService.getAffectedEquipmentMap(incidentIds);
-         incidentResponses.forEach(incidentResponse -> {
-             incidentResponse.setAffectedEquipments(
-                     affectedEquipmentMap.getOrDefault(incidentResponse.getId(), List.of())
-             );
-         });
+    private List<IncidentResponse> buildIncidentResponses(List<Incident> incidents) {
+        List<Integer> incidentIds = incidents.stream().map(Incident::getId).toList();
+        Map<Integer, List<String>> affectedEquipmentMap = affectedEquipmentService.getAffectedEquipmentMap(incidentIds);
+        Map<Integer, List<ActionsTaken>> actionsTakenMap = actionsTakenService.findIncidentIdToActionsTakenMap(incidentIds);
+
+        return incidents.stream()
+                .map(incident -> buildIncidentResponse(
+                        incident,
+                        affectedEquipmentMap.getOrDefault(incident.getId(), List.of()),
+                        actionsTakenMap.getOrDefault(incident.getId(), List.of()))
+                )
+                .toList();
     }
 
     public List<IncidentResponse> getIncidents() {
         List<Incident> incidentList = incidentRepository.findAll();
-        List<IncidentResponse> incidentResponses = buildIncidentResponses(incidentList);
-        addAffectedEquipmentsToResponses(incidentResponses);
-        return incidentResponses;
+        return buildIncidentResponses(incidentList);
     }
 
     public IncidentResponse getIncident(int id) {
         Incident incident = findById(id);
-        IncidentResponse incidentResponse = buildIncidentResponse(incident);
-        incidentResponse.setAffectedEquipments(
-                affectedEquipmentService.findAllEquipmentNamesByIncidentId(incident.getId())
-        );
-        return incidentResponse;
+        return buildIncidentResponse(incident);
     }
 
     private int getTotalEvent() {
@@ -96,11 +116,16 @@ public class IncidentService {
         return incident;
     }
 
+    private void addActionsTaken(Incident incident, IncidentRequest request) {
+        actionsTakenService.addActionsTaken(incident.getId(), userUtil.getUserName(), request.getActionsTakenByScada());
+    }
+
     @Transactional
     public IncidentResponse addIncident(IncidentRequest request) {
         Incident incident = createIncidentFromRequest(request);
         incidentRepository.save(incident);
         affectedEquipmentService.addAffectedEquipments(incident.getId(), request.getAffectedEquipments());
+        addActionsTaken(incident, request);
 
         return buildIncidentResponse(incident);
     }
@@ -131,20 +156,26 @@ public class IncidentService {
     @Transactional
     public IncidentResponse updateIncident(final int id, IncidentRequest request) {
         Incident incident = findById(id);
-        userUtil.checkEditPermission(incident);
+        incidentUtil.checkEditPermission(incident);
 
         updateIncident(incident, request);
         affectedEquipmentService.updateAffectedEquipments(incident.getId(), request.getAffectedEquipments());
         return buildIncidentResponse(incident);
     }
 
-    @Transactional
-    public IncidentResponse updateIncidentStatus(final int id, IncidentStatus status) {
-        Incident incident = findById(id);
-        userUtil.checkEditPermission(incident);
+    private void checkStatusEditPermission(Incident incident, IncidentStatus newStatus) {
+        if (IncidentStatus.RESOLVED.equals(newStatus) && incidentUtil.isAssignee(incident)) {
+            throw new AccessDeniedException("You do not have permission to resolve this incident");
+        }
+    }
 
-        // here business logic to update incident status
-        // incident.setStatus(status);
+    @Transactional
+    public IncidentResponse updateIncidentStatus(final int id, IncidentUpdateRequest updateRequest) {
+        Incident incident = findById(id);
+        incidentUtil.checkEditPermission(incident); // creator, admin or assignee
+        checkStatusEditPermission(incident, updateRequest.getStatus()); // assignee can not resolve incident
+
+        incident.setStatus(updateRequest.getStatus());
         return buildIncidentResponse(incident);
     }
 }

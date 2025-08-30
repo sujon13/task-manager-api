@@ -40,13 +40,13 @@ public class IncidentResponse {
     private String description;
 
     // actionTakenByScada
-    private List<ActionTakenRequest> actionsTakenByScada;
+    private List<ActionTakenRequest> actionsTakenByReporter;
 
     // actionTakenByContractor
-    private List<ActionTakenRequest> actionsTakenByContractor;
+    private List<ActionTakenRequest> actionsTakenByAssignee;
 
-    private String remarksByScada;
-    private String remarksByContractor;
+    private String remarksByReporter;
+    private String remarksByAssignee;
     private IncidentStatus status;
 
     // category

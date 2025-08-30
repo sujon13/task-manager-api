@@ -53,4 +53,10 @@ public class IncidentController {
         return ResponseEntity.ok(incidentResponse);
     }
 
+    @DeleteMapping("/{id}")
+    public ResponseEntity<Void> deleteIncident(@PathVariable final int id) {
+        incidentService.deleteIncident(id);
+        return ResponseEntity.noContent().build();
+    }
+
 }

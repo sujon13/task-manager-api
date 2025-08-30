@@ -48,16 +48,16 @@ public class IncidentRequest {
     private String description;
 
     // actionTakenByScada
-    private List<ActionTakenRequest> actionsTakenByScada = List.of();
+    private List<ActionTakenRequest> actionsTakenByReporter = List.of();
 
     // actionTakenByContractor
-    private List<ActionTakenRequest> actionsTakenByContractor = List.of();
+    private List<ActionTakenRequest> actionsTakenByAssignee = List.of();
 
     @Size(max = 2048)
-    private String remarksByScada;
+    private String remarksByReporter;
 
     @Size(max = 2048)
-    private String remarksByContractor;
+    private String remarksByAssignee;
 
     private IncidentStatus status = IncidentStatus.REPORTED;
 

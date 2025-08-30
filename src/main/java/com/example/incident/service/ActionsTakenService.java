@@ -10,6 +10,8 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 
@@ -46,7 +48,7 @@ public class ActionsTakenService {
     }
 
     @Transactional
-    public void deleteByIncidentId(int incidentId) {
+    public void deleteAllByIncidentId(int incidentId) {
         actionsTakenRepository.deleteAllByIncidentId(incidentId);
     }
 
@@ -57,17 +59,18 @@ public class ActionsTakenService {
                 .build();
     }
 
-    private ActionsTaken buildActionsTaken(int incidentId, String username, String action) {
+    private ActionsTaken buildActionsTaken(int incidentId, String username, ActionTakenRequest actionRequest) {
         ActionsTaken actionsTaken = new ActionsTaken();
+        actionsTaken.setId(actionRequest.getId());
         actionsTaken.setIncidentId(incidentId);
         actionsTaken.setTaker(username);
-        actionsTaken.setAction(action);
+        actionsTaken.setAction(actionRequest.getAction());
         return actionsTaken;
     }
 
     private List<ActionsTaken> buildActionsTaken(int incidentId, String username, List<ActionTakenRequest> actionRequests) {
         return actionRequests.stream()
-                .map(actionRequest -> buildActionsTaken(incidentId, username, actionRequest.getAction()))
+                .map(actionRequest -> buildActionsTaken(incidentId, username, actionRequest))
                 .toList();
     }
 
@@ -77,10 +80,27 @@ public class ActionsTakenService {
         actionsTakenRepository.saveAll(actionsTaken);
     }
 
-    /*@Transactional
-    public void updateAffectedEquipments(int incidentId, List<String> equipments) {
-        deleteByIncidentId(incidentId);
-        addAffectedEquipments(incidentId, equipments);
-    }*/
+    private void deleteOldActions(int incidentId, String username, List<ActionTakenRequest> actionTakenRequests) {
+        Set<Integer> newActionIds = actionTakenRequests.stream()
+                .map(ActionTakenRequest::getId)
+                .filter(Objects::nonNull)
+                .collect(Collectors.toUnmodifiableSet());
+
+        List<Integer> deletableActionIds =
+                actionsTakenRepository.findAllByIncidentIdAndTaker(incidentId, username)
+                        .stream()
+                        .map(ActionsTaken::getId)
+                        .filter(existingActionId -> !newActionIds.contains(existingActionId))
+                        .toList();
+        actionsTakenRepository.deleteAllById(deletableActionIds);
+    }
+
+    @Transactional
+    public void updateActionsTaken(int incidentId, String username, List<ActionTakenRequest> actionTakenRequests) {
+        deleteOldActions(incidentId, username, actionTakenRequests);
+
+        List<ActionsTaken> updatedActionsTaken = buildActionsTaken(incidentId, username, actionTakenRequests);
+        actionsTakenRepository.saveAll(updatedActionsTaken);
+    }
 
 }

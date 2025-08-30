@@ -9,6 +9,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.BeanUtils;
 import org.springframework.security.access.AccessDeniedException;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -38,11 +39,6 @@ public class IncidentService {
                 .orElseThrow(() -> new NotFoundException("Incident not found with id " + id));
     }
 
-    @Transactional
-    public void deleteIncident(int id) {
-        incidentRepository.deleteById(id);
-    }
-
     private void addActionsTaken(IncidentResponse incidentResponse, Incident incident, List<ActionsTaken> actionsTakenList) {
         Map<String, List<ActionTakenRequest>> actionsTakenMap =
                 actionsTakenList.stream()
@@ -56,10 +52,10 @@ public class IncidentService {
                                 )
                         );
 
-        incidentResponse.setActionsTakenByScada(
+        incidentResponse.setActionsTakenByReporter(
                 actionsTakenMap.getOrDefault(incident.getReportedBy(), List.of())
         );
-        incidentResponse.setActionsTakenByContractor(
+        incidentResponse.setActionsTakenByAssignee(
                 actionsTakenMap.getOrDefault(incident.getAssignedTo(), List.of())
         );
     }
@@ -117,7 +113,7 @@ public class IncidentService {
     }
 
     private void addActionsTaken(Incident incident, IncidentRequest request) {
-        actionsTakenService.addActionsTaken(incident.getId(), userUtil.getUserName(), request.getActionsTakenByScada());
+        actionsTakenService.addActionsTaken(incident.getId(), userUtil.getUserName(), request.getActionsTakenByReporter());
     }
 
     @Transactional
@@ -147,10 +143,19 @@ public class IncidentService {
             incident.setSummary(request.getSummary());
         if (request.getDescription() != null)
             incident.setDescription(request.getDescription());
-        if (request.getRemarksByScada() != null)
-            incident.setRemarksByScada(request.getRemarksByScada());
-        if (request.getRemarksByContractor() != null)
-            incident.setRemarksByContractor(request.getRemarksByContractor());
+        if (request.getRemarksByReporter() != null)
+            incident.setRemarksByReporter(request.getRemarksByReporter());
+        if (request.getRemarksByAssignee() != null)
+            incident.setRemarksByAssignee(request.getRemarksByAssignee());
+    }
+
+    private void updateActionsTaken(Incident incident, IncidentRequest request) {
+        final String userName = userUtil.getUserName();
+        if (incidentUtil.isReporterOrAdmin(incident, userName))
+            actionsTakenService.updateActionsTaken(incident.getId(), userName, request.getActionsTakenByReporter());
+
+        if (incidentUtil.isAssigneeOrAdmin(incident, userName))
+            actionsTakenService.updateActionsTaken(incident.getId(), userName, request.getActionsTakenByAssignee());
     }
 
     @Transactional
@@ -160,6 +165,7 @@ public class IncidentService {
 
         updateIncident(incident, request);
         affectedEquipmentService.updateAffectedEquipments(incident.getId(), request.getAffectedEquipments());
+        updateActionsTaken(incident, request);
         return buildIncidentResponse(incident);
     }
 
@@ -177,5 +183,13 @@ public class IncidentService {
 
         incident.setStatus(updateRequest.getStatus());
         return buildIncidentResponse(incident);
+    }
+
+    @Transactional
+    @PreAuthorize("hasRole('ADMIN')")
+    public void deleteIncident(int id) {
+        affectedEquipmentService.deleteByIncidentId(id);
+        actionsTakenService.deleteAllByIncidentId(id);
+        incidentRepository.deleteById(id);
     }
 }

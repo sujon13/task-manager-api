@@ -7,21 +7,43 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.stereotype.Service;
 
+import java.util.Objects;
+
 @Service
 @Slf4j
 @RequiredArgsConstructor
 public class IncidentUtil {
     private final UserUtil userUtil;
 
+
+    public boolean isAssignee(Incident incident, String userName) {
+        return Objects.equals(incident.getAssignedTo(), userName);
+    }
+
     public boolean isAssignee(Incident incident) {
-        String userName = userUtil.getUserName();
-        return incident.getAssignedTo().equals(userName);
+        return isAssignee(incident, userUtil.getUserName());
+    }
+
+    public boolean isReporterOrAdmin(Incident incident, String userName) {
+        return incident.getReportedBy().equals(userName) || userUtil.isAdmin();
+    }
+
+    public boolean isReporterOrAdmin(Incident incident) {
+        return isReporterOrAdmin(incident, userUtil.getUserName());
+    }
+
+    public boolean isAssigneeOrAdmin(Incident incident, String userName) {
+        return isAssignee(incident, userName) || userUtil.isAdmin();
+    }
+
+    public boolean isAssigneeOrAdmin(Incident incident) {
+        return isAssigneeOrAdmin(incident, userUtil.getUserName());
     }
 
     public void checkEditPermission(Incident incident) {
-        userUtil.checkEditPermission(incident);
-
-        if (!isAssignee(incident)) {
+        final String userName = userUtil.getUserName();
+        if (!userUtil.hasEditPermission(incident) && !isAssignee(incident, userName)) {
+            log.error("User {} does not have permission to edit incident {}", userName, incident.getId());
             throw new AccessDeniedException("You do not have permission to edit this incident");
         }
     }

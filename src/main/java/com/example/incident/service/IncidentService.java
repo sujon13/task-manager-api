@@ -122,6 +122,7 @@ public class IncidentService {
         BeanUtils.copyProperties(request, incident);
         incident.setEventNo(getTotalEvent() + 1);
         incident.setReportedBy(userUtil.getUserName());
+        incident.setStatus(IncidentStatus.REPORTED);
         return incident;
     }
 

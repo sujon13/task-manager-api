@@ -29,7 +29,7 @@ public class IncidentController {
 
     @GetMapping("")
     public ResponseEntity<Page<IncidentResponse>> getAllIncidents(
-            @PageableDefault(page = 0, size = 10, sort = "createdAt", direction = Sort.Direction.DESC) final Pageable pageable
+            @PageableDefault(page = 0, size = 5, sort = "createdAt", direction = Sort.Direction.DESC) final Pageable pageable
     ) {
         Page<IncidentResponse> incidentList = incidentService.getIncidents(pageable);
         return ResponseEntity.ok(incidentList);

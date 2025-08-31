@@ -54,6 +54,7 @@ public class SecurityConfig {
                 .authorizeHttpRequests(requests -> requests
                         .requestMatchers(HttpMethod.GET, PUBLIC_ENDPOINTS.toArray(new String[0])).permitAll()
 
+                        .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()// Allow all OPTIONS requests (preflight)
                         .requestMatchers(HttpMethod.POST, PREFIX + "/likes").hasAnyRole("USER")
                         //.requestMatchers(HttpMethod.GET, PREFIX + "/likes").permitAll()
                         .requestMatchers(PREFIX + "/comments", PREFIX + "/comments/**").hasAnyRole("USER")

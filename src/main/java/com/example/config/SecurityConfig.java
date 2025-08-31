@@ -39,7 +39,7 @@ public class SecurityConfig {
             PREFIX + "/exams/*/questionCountMap",
             PREFIX + "/topics",
             PREFIX + "/topics/*/directSubTopics",
-            //PREFIX + "/incidents",
+            PREFIX + "/incidents/*/dropdown",
             "/error"
     );
 

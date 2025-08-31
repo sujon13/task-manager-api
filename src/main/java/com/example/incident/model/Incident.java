@@ -2,8 +2,10 @@ package com.example.incident.model;
 
 import com.example.incident.converter.FaultNatureConverter;
 import com.example.incident.converter.IncidentStatusConverter;
+import com.example.incident.converter.PriorityConverter;
 import com.example.incident.enums.FaultNature;
 import com.example.incident.enums.IncidentStatus;
+import com.example.incident.enums.Priority;
 import com.example.qa.model.Auditable;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
@@ -78,6 +80,11 @@ public class Incident extends Auditable {
     @Column(name = "status")
     @Convert(converter = IncidentStatusConverter.class)
     private IncidentStatus status = IncidentStatus.REPORTED;
+
+
+    @Column(name = "priority")
+    @Convert(converter = PriorityConverter.class)
+    private Priority priority = Priority.HIGH;
 
     // category
     // sub-category

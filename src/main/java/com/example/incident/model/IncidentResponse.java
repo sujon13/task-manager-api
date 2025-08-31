@@ -2,6 +2,7 @@ package com.example.incident.model;
 
 import com.example.incident.enums.FaultNature;
 import com.example.incident.enums.IncidentStatus;
+import com.example.incident.enums.Priority;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.*;
 
@@ -48,6 +49,7 @@ public class IncidentResponse {
     private String remarksByReporter;
     private String remarksByAssignee;
     private IncidentStatus status;
+    private Priority priority;
 
     // category
     // sub-category

@@ -2,6 +2,7 @@ package com.example.incident.model;
 
 import com.example.incident.enums.FaultNature;
 import com.example.incident.enums.IncidentStatus;
+import com.example.incident.enums.Priority;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
@@ -60,6 +61,8 @@ public class IncidentRequest {
     private String remarksByAssignee;
 
     private IncidentStatus status = IncidentStatus.REPORTED;
+
+    private Priority priority = Priority.HIGH;
 
     // category
     // sub-category

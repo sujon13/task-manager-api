@@ -2,8 +2,10 @@ package com.example.incident.service;
 
 import com.example.exception.NotFoundException;
 import com.example.incident.enums.IncidentStatus;
+import com.example.incident.enums.Priority;
 import com.example.incident.model.*;
 import com.example.incident.repository.IncidentRepository;
+import com.example.util.Dropdown;
 import com.example.util.UserUtil;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -16,6 +18,7 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -157,6 +160,8 @@ public class IncidentService {
             incident.setRemarksByReporter(request.getRemarksByReporter());
         if (request.getRemarksByAssignee() != null)
             incident.setRemarksByAssignee(request.getRemarksByAssignee());
+        if (request.getPriority() != null)
+            incident.setPriority(request.getPriority());
     }
 
     private void updateActionsTaken(Incident incident, IncidentRequest request) {
@@ -206,5 +211,19 @@ public class IncidentService {
         affectedEquipmentService.deleteByIncidentId(id);
         actionsTakenService.deleteAllByIncidentId(id);
         incidentRepository.deleteById(id);
+    }
+
+    // util
+    private Dropdown buildDropdown(final Priority priority) {
+        return Dropdown.builder()
+                .id(priority.getValue())
+                .name(priority.getName())
+                .build();
+    }
+
+    public List<Dropdown> getPriorityDropdown() {
+        return Arrays.stream(Priority.values())
+                .map(this::buildDropdown)
+                .toList();
     }
 }

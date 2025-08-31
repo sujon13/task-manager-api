@@ -4,6 +4,7 @@ import com.example.incident.model.IncidentRequest;
 import com.example.incident.model.IncidentResponse;
 import com.example.incident.model.IncidentUpdateRequest;
 import com.example.incident.service.IncidentService;
+import com.example.util.Dropdown;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -14,6 +15,8 @@ import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 
 @RestController
@@ -61,6 +64,11 @@ public class IncidentController {
     public ResponseEntity<Void> deleteIncident(@PathVariable final int id) {
         incidentService.deleteIncident(id);
         return ResponseEntity.noContent().build();
+    }
+
+    @GetMapping("/priority/dropdown")
+    public List<Dropdown> getPriorityDropdown() {
+        return incidentService.getPriorityDropdown();
     }
 
 }

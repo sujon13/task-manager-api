@@ -49,6 +49,7 @@ public class IncidentResponse {
     private String remarksByReporter;
     private String remarksByAssignee;
     private IncidentStatus status;
+    private String statusStr;
     private Priority priority;
 
     // is Reporter or Assignee

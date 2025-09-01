@@ -83,6 +83,7 @@ public class IncidentService {
                                                    Map<String, UserResponse> userNameToUserResponseMap) {
         IncidentResponse incidentResponse = new IncidentResponse();
         BeanUtils.copyProperties(incident, incidentResponse);
+        incidentResponse.setStatusStr(incident.getStatus().getDisplayName());
 
         setUserDetailsToIncidentResponse(incidentResponse, incident, userNameToUserResponseMap);
 

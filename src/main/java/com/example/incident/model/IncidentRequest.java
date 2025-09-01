@@ -4,7 +4,7 @@ import com.example.incident.enums.FaultNature;
 import com.example.incident.enums.IncidentStatus;
 import com.example.incident.enums.Priority;
 import com.fasterxml.jackson.annotation.JsonFormat;
-import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.Size;
 import lombok.*;
 
@@ -41,6 +41,7 @@ public class IncidentRequest {
     // Affected Equipment
     private List<String> affectedEquipments = List.of();
 
+    @NotEmpty
     @Size(max = 1024)
     private String summary;
 

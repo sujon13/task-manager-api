@@ -9,10 +9,10 @@ import java.util.stream.Stream;
 
 @Getter
 public enum IncidentStatus {
-    REPORTED(0),
-    IN_PROGRESS(1),
-    IN_REVIEW(2),
-    RESOLVED(3);
+    REPORTED(0, "Reported"),
+    IN_PROGRESS(1, "In Progress"),
+    IN_REVIEW(2, "In Review"),
+    RESOLVED(3, "Resolved");
 
     private static final Map<Integer, IncidentStatus> mapByValue;
 
@@ -22,12 +22,18 @@ public enum IncidentStatus {
     }
 
     private final int value;
+    private final String displayName;
 
-    IncidentStatus(int value) {
+    IncidentStatus(int value, String displayName) {
         this.value = value;
+        this.displayName = displayName;
     }
 
     public static IncidentStatus getByValue(Integer value) {
         return value == null ? null : mapByValue.get(value);
+    }
+
+    public String getName() {
+        return this.name();
     }
 }

@@ -5,7 +5,6 @@ import com.example.incident.enums.IncidentStatus;
 import com.example.incident.enums.Priority;
 import com.example.incident.model.*;
 import com.example.incident.repository.IncidentRepository;
-import com.example.util.Dropdown;
 import com.example.util.UserUtil;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -220,12 +219,22 @@ public class IncidentService {
     }
 
     // util
-    private PriorityDropdown buildDropdown(final Priority priority) {
-        return new PriorityDropdown(priority.getName(), priority.getDisplayName());
+    private CustomDropdown buildDropdown(final Priority priority) {
+        return new CustomDropdown(priority.getName(), priority.getDisplayName());
     }
 
-    public List<PriorityDropdown> getPriorityDropdown() {
+    private CustomDropdown buildDropdown(final IncidentStatus incidentStatus) {
+        return new CustomDropdown(incidentStatus.getName(), incidentStatus.getDisplayName());
+    }
+
+    public List<CustomDropdown> getPriorityDropdown() {
         return Arrays.stream(Priority.values())
+                .map(this::buildDropdown)
+                .toList();
+    }
+
+    public List<CustomDropdown> getStatusDropdown() {
+        return Arrays.stream(IncidentStatus.values())
                 .map(this::buildDropdown)
                 .toList();
     }

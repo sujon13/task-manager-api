@@ -3,7 +3,7 @@ package com.example.incident.controller;
 import com.example.incident.model.IncidentRequest;
 import com.example.incident.model.IncidentResponse;
 import com.example.incident.model.IncidentUpdateRequest;
-import com.example.incident.model.PriorityDropdown;
+import com.example.incident.model.CustomDropdown;
 import com.example.incident.service.IncidentService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -67,8 +67,13 @@ public class IncidentController {
     }
 
     @GetMapping("/priority/dropdown")
-    public List<PriorityDropdown> getPriorityDropdown() {
+    public List<CustomDropdown> getPriorityDropdown() {
         return incidentService.getPriorityDropdown();
+    }
+
+    @GetMapping("/status/dropdown")
+    public List<CustomDropdown> getStatusDropdown() {
+        return incidentService.getStatusDropdown();
     }
 
 }

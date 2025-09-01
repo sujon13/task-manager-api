@@ -93,12 +93,17 @@ public class IncidentService {
         Map<Integer, List<String>> affectedEquipmentMap = affectedEquipmentService.getAffectedEquipmentMap(incidentIds);
         Map<Integer, List<ActionsTaken>> actionsTakenMap = actionsTakenService.findIncidentIdToActionsTakenMap(incidentIds);
 
+        final String me = userUtil.getUserName();
         List<IncidentResponse> incidentResponses = incidents.stream()
                 .map(incident -> buildIncidentResponse(
                         incident,
                         affectedEquipmentMap.getOrDefault(incident.getId(), List.of()),
                         actionsTakenMap.getOrDefault(incident.getId(), List.of()))
                 )
+                .peek(incidentResponse -> {
+                    incidentResponse.setReporter(me.equals(incidentResponse.getReportedBy()));
+                    incidentResponse.setAssignee(me.equals(incidentResponse.getAssignedTo()));
+                })
                 .toList();
         return new PageImpl<>(incidentResponses, incidents.getPageable(), incidents.getTotalElements());
     }
@@ -215,14 +220,11 @@ public class IncidentService {
     }
 
     // util
-    private Dropdown buildDropdown(final Priority priority) {
-        return Dropdown.builder()
-                .id(priority.getValue())
-                .name(priority.getName())
-                .build();
+    private PriorityDropdown buildDropdown(final Priority priority) {
+        return new PriorityDropdown(priority.getName(), priority.getDisplayName());
     }
 
-    public List<Dropdown> getPriorityDropdown() {
+    public List<PriorityDropdown> getPriorityDropdown() {
         return Arrays.stream(Priority.values())
                 .map(this::buildDropdown)
                 .toList();

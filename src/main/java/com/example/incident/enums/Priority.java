@@ -8,10 +8,10 @@ import java.util.stream.Stream;
 
 @Getter
 public enum Priority {
-    CRITICAL(1),
-    HIGH(2),
-    MEDIUM(3),
-    LOW(4);
+    CRITICAL(1, "Critical"),
+    HIGH(2, "High"),
+    MEDIUM(3, "Medium"),
+    LOW(4, "Low");
 
     private static final Map<Integer, Priority> mapByValue;
 
@@ -21,9 +21,11 @@ public enum Priority {
     }
 
     private final int value;
+    private final String displayName;
 
-    Priority(int value) {
+    Priority(int value, String displayName) {
         this.value = value;
+        this.displayName = displayName;
     }
 
     public static Priority getByValue(Integer value) {

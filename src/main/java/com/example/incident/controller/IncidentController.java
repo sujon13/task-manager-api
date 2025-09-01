@@ -3,8 +3,8 @@ package com.example.incident.controller;
 import com.example.incident.model.IncidentRequest;
 import com.example.incident.model.IncidentResponse;
 import com.example.incident.model.IncidentUpdateRequest;
+import com.example.incident.model.PriorityDropdown;
 import com.example.incident.service.IncidentService;
-import com.example.util.Dropdown;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -67,7 +67,7 @@ public class IncidentController {
     }
 
     @GetMapping("/priority/dropdown")
-    public List<Dropdown> getPriorityDropdown() {
+    public List<PriorityDropdown> getPriorityDropdown() {
         return incidentService.getPriorityDropdown();
     }
 

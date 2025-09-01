@@ -11,7 +11,6 @@ import java.util.List;
 
 @Getter
 @Setter
-@Builder
 @NoArgsConstructor
 @AllArgsConstructor
 public class IncidentResponse {
@@ -50,6 +49,10 @@ public class IncidentResponse {
     private String remarksByAssignee;
     private IncidentStatus status;
     private Priority priority;
+
+    // is Reporter or Assignee
+    private boolean isReporter = false;
+    private boolean isAssignee = false;
 
     // category
     // sub-category

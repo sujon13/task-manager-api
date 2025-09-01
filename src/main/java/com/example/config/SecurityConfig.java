@@ -1,6 +1,6 @@
 package com.example.config;
 
-import com.example.auth.JwtRequestFilter;
+import com.example.auth.service.JwtRequestFilter;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;

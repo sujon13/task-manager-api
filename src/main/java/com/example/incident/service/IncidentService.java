@@ -1,10 +1,13 @@
 package com.example.incident.service;
 
+import com.example.auth.model.UserResponse;
+import com.example.auth.service.UserService;
 import com.example.exception.NotFoundException;
 import com.example.incident.enums.IncidentStatus;
 import com.example.incident.enums.Priority;
 import com.example.incident.model.*;
 import com.example.incident.repository.IncidentRepository;
+import com.example.incident.specification.IncidentSpecification;
 import com.example.util.UserUtil;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -12,15 +15,17 @@ import org.springframework.beans.BeanUtils;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.StringUtils;
 
-import java.util.Arrays;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
+import java.util.function.Function;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 
 @Service
@@ -34,6 +39,7 @@ public class IncidentService {
     private final IncidentStatusTrackerService incidentStatusTrackerService;
     private final IncidentUtil incidentUtil;
     private final UserUtil userUtil;
+    private final UserService userService;
 
 
     public List<Incident> findAllByIds(List<Integer> ids) {
@@ -72,9 +78,14 @@ public class IncidentService {
     }
 
     private IncidentResponse buildIncidentResponse(Incident incident,
-                                                   List<String> affectedEquipments, List<ActionsTaken> actionsTakenList) {
+                                                   List<String> affectedEquipments,
+                                                   List<ActionsTaken> actionsTakenList,
+                                                   Map<String, UserResponse> userNameToUserResponseMap) {
         IncidentResponse incidentResponse = new IncidentResponse();
         BeanUtils.copyProperties(incident, incidentResponse);
+
+        setUserDetailsToIncidentResponse(incidentResponse, incident, userNameToUserResponseMap);
+
         incidentResponse.setAffectedEquipments(affectedEquipments);
         addActionsTaken(incidentResponse, incident, actionsTakenList);
         return incidentResponse;
@@ -83,32 +94,65 @@ public class IncidentService {
     private IncidentResponse buildIncidentResponse(Incident incident) {
         List<String> affectedEquipments = affectedEquipmentService.findAllEquipmentNamesByIncidentId(incident.getId());
         List<ActionsTaken> actionsTakenList = actionsTakenService.findAllByIncidentId(incident.getId());
+        Map<String, UserResponse> userNameToUserResponseMap = getUserNameToResponseMap(List.of(incident));
 
-        return buildIncidentResponse(incident, affectedEquipments, actionsTakenList);
+        return buildIncidentResponse(incident, affectedEquipments, actionsTakenList, userNameToUserResponseMap);
+    }
+
+    private void checkAndSetIfLoggedInUserIsReporterOrAssignee(IncidentResponse incidentResponse, String me) {
+        UserResponse reportedBy = incidentResponse.getReportedBy();
+        UserResponse assignedTo = incidentResponse.getAssignedTo();
+        if (reportedBy != null)
+            incidentResponse.setReporter(me.equals(reportedBy.getUserName()));
+        if (assignedTo != null)
+            incidentResponse.setAssignee(me.equals(assignedTo.getUserName()));
+    }
+
+    private Map<String, UserResponse> getUserNameToResponseMap(List<Incident> incidents) {
+        Set<String> userNames = incidents.stream()
+                .flatMap(incident -> Stream.of(incident.getReportedBy(),incident.getAssignedTo()))
+                .filter(StringUtils::hasText)
+                .collect(Collectors.toUnmodifiableSet());
+        List<UserResponse> userResponses = userService.fetchUsers(userNames);
+        return userResponses.stream()
+                .collect(Collectors.toMap(UserResponse::getUserName, Function.identity()));
+    }
+
+    private void setUserDetailsToIncidentResponse(IncidentResponse incidentResponse, Incident incident,
+                                                  Map<String, UserResponse> userResponseMap) {
+        final String reportedBy = incident.getReportedBy();
+        incidentResponse.setReportedBy(
+                userResponseMap.getOrDefault(reportedBy, UserResponse.builder().userName(reportedBy).build())
+        );
+
+        final String assignedTo = incident.getAssignedTo();
+        incidentResponse.setAssignedTo(
+                userResponseMap.getOrDefault(assignedTo, UserResponse.builder().userName(assignedTo).build())
+        );
     }
 
     private Page<IncidentResponse> buildIncidentResponses(Page<Incident> incidents) {
         List<Integer> incidentIds = incidents.stream().map(Incident::getId).toList();
         Map<Integer, List<String>> affectedEquipmentMap = affectedEquipmentService.getAffectedEquipmentMap(incidentIds);
         Map<Integer, List<ActionsTaken>> actionsTakenMap = actionsTakenService.findIncidentIdToActionsTakenMap(incidentIds);
+        Map<String, UserResponse> userNameToUserResponseMap = getUserNameToResponseMap(incidents.toList());
 
         final String me = userUtil.getUserName();
         List<IncidentResponse> incidentResponses = incidents.stream()
                 .map(incident -> buildIncidentResponse(
                         incident,
                         affectedEquipmentMap.getOrDefault(incident.getId(), List.of()),
-                        actionsTakenMap.getOrDefault(incident.getId(), List.of()))
+                        actionsTakenMap.getOrDefault(incident.getId(), List.of()),
+                        userNameToUserResponseMap)
                 )
-                .peek(incidentResponse -> {
-                    incidentResponse.setReporter(me.equals(incidentResponse.getReportedBy()));
-                    incidentResponse.setAssignee(me.equals(incidentResponse.getAssignedTo()));
-                })
+                .peek(incidentResponse -> checkAndSetIfLoggedInUserIsReporterOrAssignee(incidentResponse, me))
                 .toList();
         return new PageImpl<>(incidentResponses, incidents.getPageable(), incidents.getTotalElements());
     }
 
-    public Page<IncidentResponse> getIncidents(Pageable pageable) {
-        Page<Incident> incidents = incidentRepository.findAll(pageable);
+    public Page<IncidentResponse> getIncidents(IncidentFilterRequest request, Pageable pageable) {
+        Specification<Incident> incidentSpecification = IncidentSpecification.buildSpecification(request);
+        Page<Incident> incidents = incidentRepository.findAll(incidentSpecification, pageable);
         return buildIncidentResponses(incidents);
     }
 

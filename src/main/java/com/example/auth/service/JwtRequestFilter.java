@@ -1,5 +1,6 @@
-package com.example.auth;
+package com.example.auth.service;
 
+import com.example.auth.model.CustomUserPrincipal;
 import com.example.config.SecurityConfig;
 import com.example.util.Constants;
 import io.jsonwebtoken.ExpiredJwtException;

@@ -1,5 +1,6 @@
 package com.example.incident.model;
 
+import com.example.auth.model.UserResponse;
 import com.example.incident.enums.FaultNature;
 import com.example.incident.enums.IncidentStatus;
 import com.example.incident.enums.Priority;
@@ -25,8 +26,8 @@ public class IncidentResponse {
     @JsonFormat(pattern = "dd-MM-yyyy HH:mm")
     private LocalDateTime reportedAt;
 
-    private String reportedBy;
-    private String assignedTo;
+    private UserResponse reportedBy;
+    private UserResponse assignedTo;
 
     @JsonFormat(pattern = "dd-MM-yyyy HH:mm")
     private LocalDateTime resolvedAt;

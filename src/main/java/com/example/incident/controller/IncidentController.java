@@ -1,9 +1,6 @@
 package com.example.incident.controller;
 
-import com.example.incident.model.IncidentRequest;
-import com.example.incident.model.IncidentResponse;
-import com.example.incident.model.IncidentUpdateRequest;
-import com.example.incident.model.CustomDropdown;
+import com.example.incident.model.*;
 import com.example.incident.service.IncidentService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -29,10 +26,11 @@ public class IncidentController {
 
     @GetMapping("")
     public ResponseEntity<Page<IncidentResponse>> getAllIncidents(
+            IncidentFilterRequest filterRequest,
             @PageableDefault(page = 0, size = 5, sort = "createdAt", direction = Sort.Direction.DESC) final Pageable pageable
     ) {
-        Page<IncidentResponse> incidentList = incidentService.getIncidents(pageable);
-        return ResponseEntity.ok(incidentList);
+        Page<IncidentResponse> incidentResponses = incidentService.getIncidents(filterRequest, pageable);
+        return ResponseEntity.ok(incidentResponses);
     }
 
     @GetMapping("/{id}")

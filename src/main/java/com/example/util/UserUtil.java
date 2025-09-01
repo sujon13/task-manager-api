@@ -1,6 +1,6 @@
 package com.example.util;
 
-import com.example.auth.CustomUserPrincipal;
+import com.example.auth.model.CustomUserPrincipal;
 import com.example.qa.model.Auditable;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.access.AccessDeniedException;

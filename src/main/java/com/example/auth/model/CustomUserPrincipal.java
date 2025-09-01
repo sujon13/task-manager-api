@@ -1,4 +1,4 @@
-package com.example.auth;
+package com.example.auth.model;
 
 
 import lombok.Getter;

@@ -62,11 +62,15 @@ public class JwtRequestFilter extends OncePerRequestFilter {
                 );
     }
 
+    private boolean isOptionsRequest(final HttpServletRequest request) {
+        return HttpMethod.OPTIONS.matches(request.getMethod());
+    }
+
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain chain)
             throws ServletException, IOException {
 
-        if (isPublicEndpoint(request)) {
+        if (isPublicEndpoint(request) || isOptionsRequest(request)) {
             // Skip token validation for public endpoints
             chain.doFilter(request, response);
             return;
@@ -97,17 +101,13 @@ public class JwtRequestFilter extends OncePerRequestFilter {
         }
 
         if (username != null && SecurityContextHolder.getContext().getAuthentication() == null) {
-
-            //User user = userService.getUserByUserName(username).orElseThrow();
-
-            if (jwtUtil.validateToken(jwt, username)) {
-                List<? extends GrantedAuthority> authorities = jwtUtil.extractRoles(jwt);
-                final CustomUserPrincipal principal = jwtUtil.buildUserPrincipal(jwt, authorities);
-                UsernamePasswordAuthenticationToken authenticationToken = new UsernamePasswordAuthenticationToken(
-                        principal, null, authorities);
-                authenticationToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
-                SecurityContextHolder.getContext().setAuthentication(authenticationToken);
-            }
+            // skip recheck user if it is altered meanwhile
+            List<? extends GrantedAuthority> authorities = jwtUtil.extractRoles(jwt);
+            final CustomUserPrincipal principal = jwtUtil.buildUserPrincipal(jwt, authorities);
+            UsernamePasswordAuthenticationToken authenticationToken = new UsernamePasswordAuthenticationToken(
+                    principal, null, authorities);
+            authenticationToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
+            SecurityContextHolder.getContext().setAuthentication(authenticationToken);
         }
         chain.doFilter(request, response);
     }

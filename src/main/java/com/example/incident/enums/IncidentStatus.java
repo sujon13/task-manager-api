@@ -11,7 +11,7 @@ import java.util.stream.Stream;
 public enum IncidentStatus {
     REPORTED(0, "Reported"),
     IN_PROGRESS(1, "In Progress"),
-    IN_REVIEW(2, "In Review"),
+    IN_REVIEW(2, "Under Observation"),
     RESOLVED(3, "Resolved");
 
     private static final Map<Integer, IncidentStatus> mapByValue;

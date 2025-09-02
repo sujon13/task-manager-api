@@ -171,7 +171,12 @@ public class IncidentService {
         BeanUtils.copyProperties(request, incident);
         incident.setEventNo(getTotalEvent() + 1);
         incident.setReportedBy(userUtil.getUserName());
-        incident.setStatus(IncidentStatus.REPORTED);
+
+        incident.setStatus(
+                incident.getAssignedTo() != null
+                        ? IncidentStatus.IN_PROGRESS
+                        : IncidentStatus.REPORTED
+        );
         return incident;
     }
 
@@ -190,26 +195,28 @@ public class IncidentService {
     }
 
     private void updateIncident(Incident incident, IncidentRequest request) {
-        if (request.getStation() != null)
-            incident.setStation(request.getStation());
-        if (request.getLocation() != null)
-            incident.setLocation(request.getLocation());
+        incident.setStation(request.getStation());
+        incident.setLocation(request.getLocation());
+
         if (request.getOccurredAt() != null)
             incident.setOccurredAt(request.getOccurredAt());
         // skip reportedAt
-        if (request.getAssignedTo() != null)
+
+        if (StringUtils.hasText(request.getAssignedTo())) {
             incident.setAssignedTo(request.getAssignedTo());
+        } else {
+            incident.setAssignedTo(null);
+        }
+
         // skip resolvedAt
         if (request.getFaultNature() != null)
             incident.setFaultNature(request.getFaultNature());
-        if (request.getSummary() != null)
-            incident.setSummary(request.getSummary());
-        if (request.getDescription() != null)
-            incident.setDescription(request.getDescription());
-        if (request.getRemarksByReporter() != null)
-            incident.setRemarksByReporter(request.getRemarksByReporter());
-        if (request.getRemarksByAssignee() != null)
-            incident.setRemarksByAssignee(request.getRemarksByAssignee());
+
+        incident.setSummary(request.getSummary());
+        incident.setDescription(request.getDescription());
+        incident.setRemarksByReporter(request.getRemarksByReporter());
+        incident.setRemarksByAssignee(request.getRemarksByAssignee());
+
         if (request.getPriority() != null)
             incident.setPriority(request.getPriority());
     }
@@ -223,11 +230,27 @@ public class IncidentService {
             actionsTakenService.updateActionsTaken(incident.getId(), userName, request.getActionsTakenByAssignee());
     }
 
+    private void updateStatusDueToAssigneeChange(Incident incident, IncidentRequest request) {
+        if (!StringUtils.hasText(incident.getAssignedTo()) && !StringUtils.hasText(request.getAssignedTo())) {
+            // no change in assignee
+            return;
+        }
+
+        if (!StringUtils.hasText(request.getAssignedTo())) {
+            incident.setStatus(IncidentStatus.REPORTED);
+        } else {
+            if (!request.getAssignedTo().equals(incident.getAssignedTo())) {
+                incident.setStatus(IncidentStatus.IN_PROGRESS);
+            }
+        }
+    }
+
     @Transactional
     public IncidentResponse updateIncident(final int id, IncidentRequest request) {
         Incident incident = findById(id);
         incidentUtil.checkEditPermission(incident);
 
+        updateStatusDueToAssigneeChange(incident, request);
         updateIncident(incident, request);
         affectedEquipmentService.updateAffectedEquipments(incident.getId(), request.getAffectedEquipments());
         updateActionsTaken(incident, request);
@@ -240,13 +263,13 @@ public class IncidentService {
         }
     }
 
-    private void updateIncidentStatus(Incident incident, IncidentUpdateRequest updateRequest) {
+    private void updateIncidentStatus(Incident incident, IncidentRequest updateRequest) {
         incidentStatusTrackerService.addIncidentStatus(incident, updateRequest.getStatus());
         incident.setStatus(updateRequest.getStatus());
     }
 
     @Transactional
-    public IncidentResponse updateIncidentStatus(final int id, IncidentUpdateRequest updateRequest) {
+    public IncidentResponse updateIncidentStatus(final int id, IncidentRequest updateRequest) {
         Incident incident = findById(id);
         incidentUtil.checkEditPermission(incident); // creator, admin or assignee
         checkStatusEditPermission(incident, updateRequest.getStatus()); // assignee can not resolve incident

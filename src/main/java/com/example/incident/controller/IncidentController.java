@@ -51,13 +51,6 @@ public class IncidentController {
         return ResponseEntity.ok(incidentResponse);
     }
 
-    @PatchMapping("/{id}/status")
-    public ResponseEntity<IncidentResponse> updateIncidentStatus(@PathVariable int id,
-                                                                 @Valid @RequestBody IncidentUpdateRequest updateRequest) {
-        IncidentResponse incidentResponse = incidentService.updateIncidentStatus(id, updateRequest);
-        return ResponseEntity.ok(incidentResponse);
-    }
-
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deleteIncident(@PathVariable final int id) {
         incidentService.deleteIncident(id);

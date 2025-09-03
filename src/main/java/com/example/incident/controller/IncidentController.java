@@ -51,6 +51,12 @@ public class IncidentController {
         return ResponseEntity.ok(incidentResponse);
     }
 
+    @PutMapping("/update-by-assignee/{id}")
+    public ResponseEntity<Void> updateIncidentByAssignee(@PathVariable int id, @Valid @RequestBody UpdateRequestByAssignee request) {
+        incidentService.updateIncidentByAssignee(id, request);
+        return ResponseEntity.ok().build();
+    }
+
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deleteIncident(@PathVariable final int id) {
         incidentService.deleteIncident(id);

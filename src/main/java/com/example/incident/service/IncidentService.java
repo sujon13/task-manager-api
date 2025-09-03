@@ -22,6 +22,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
 
+import java.time.LocalDateTime;
 import java.util.*;
 import java.util.function.Function;
 import java.util.stream.Collectors;
@@ -282,6 +283,12 @@ public class IncidentService {
         }
     }
 
+    private void setIncidentResolveTime(Incident incident) {
+        if (IncidentStatus.RESOLVED.equals(incident.getStatus())) {
+            incident.setResolvedAt(LocalDateTime.now());
+        }
+    }
+
     @Transactional
     public void updateIncidentByReporter(final int id, UpdateRequestByReporter request) {
         Incident incident = findById(id);
@@ -293,6 +300,8 @@ public class IncidentService {
                         ? IncidentStatus.IN_REVIEW
                         : IncidentStatus.RESOLVED
         );
+
+        setIncidentResolveTime(incident);
     }
 
     private void checkStatusEditPermission(Incident incident, IncidentStatus newStatus) {

@@ -272,6 +272,29 @@ public class IncidentService {
         incident.setStatus(IncidentStatus.COMPLETED);
     }
 
+    private void checkReporterPermission(Incident incident) {
+        if (!incidentUtil.isReporter(incident)) {
+            throw new AccessDeniedException("You do not have permission to update this incident");
+        }
+
+        if (!List.of(IncidentStatus.COMPLETED, IncidentStatus.IN_REVIEW).contains(incident.getStatus())) {
+            throw new AccessDeniedException("You do not have permission to update this incident");
+        }
+    }
+
+    @Transactional
+    public void updateIncidentByReporter(final int id, UpdateRequestByReporter request) {
+        Incident incident = findById(id);
+        checkReporterPermission(incident);
+
+        incident.setRemarksByReporter(request.getRemarksByReporter());
+        incident.setStatus(
+                IncidentStatus.COMPLETED.equals(incident.getStatus())
+                        ? IncidentStatus.IN_REVIEW
+                        : IncidentStatus.RESOLVED
+        );
+    }
+
     private void checkStatusEditPermission(Incident incident, IncidentStatus newStatus) {
         if (IncidentStatus.RESOLVED.equals(newStatus) && incidentUtil.isAssignee(incident)) {
             throw new AccessDeniedException("You do not have permission to resolve this incident");

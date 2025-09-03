@@ -24,8 +24,16 @@ public class IncidentUtil {
         return isAssignee(incident, userUtil.getUserName());
     }
 
+    public boolean isReporter(Incident incident, String userName) {
+        return incident.getReportedBy().equals(userName);
+    }
+
+    public boolean isReporter(Incident incident) {
+        return isReporter(incident, userUtil.getUserName());
+    }
+
     public boolean isReporterOrAdmin(Incident incident, String userName) {
-        return incident.getReportedBy().equals(userName) || userUtil.isAdmin();
+        return isReporter(incident, userName) || userUtil.isAdmin();
     }
 
     public boolean isReporterOrAdmin(Incident incident) {

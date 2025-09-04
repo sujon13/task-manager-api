@@ -7,6 +7,8 @@ import com.example.incident.model.IncidentFilterRequest;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.util.StringUtils;
 
+import java.time.LocalDateTime;
+
 public class IncidentSpecification {
     private static Specification<Incident> hasData(final String data, final String entityField) {
         return (root, query, criteriaBuilder) ->
@@ -29,11 +31,28 @@ public class IncidentSpecification {
                         : cb.equal(root.get("priority"), priority);
     }
 
+    private static Specification<Incident> hasReportedAtFrom(LocalDateTime from) {
+        return (root, query, cb) ->
+                from == null
+                        ? null
+                        : cb.greaterThanOrEqualTo(root.get("reportedAt"), from);
+    }
+
+    private static Specification<Incident> hasReportedAtTo(LocalDateTime to) {
+        return (root, query, cb) ->
+                to == null
+                        ? null
+                        : cb.lessThanOrEqualTo(root.get("reportedAt"), to);
+    }
+
+
     public static Specification<Incident> buildSpecification(IncidentFilterRequest request) {
         return Specification
                 .where(hasData(request.getReportedBy(), "reportedBy"))
                 .and(hasData(request.getAssignedTo(), "assignedTo"))
                 .and(hasPriority(request.getPriority()))
-                .and(hasStatus(request.getStatus()));
+                .and(hasStatus(request.getStatus()))
+                .and(hasReportedAtFrom(request.getReportedAtFrom()))
+                .and(hasReportedAtTo(request.getReportedAtTo()));
     }
 }

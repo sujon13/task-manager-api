@@ -296,9 +296,9 @@ public class IncidentService {
 
         incident.setRemarksByReporter(request.getRemarksByReporter());
         incident.setStatus(
-                IncidentStatus.COMPLETED.equals(incident.getStatus())
-                        ? IncidentStatus.IN_REVIEW
-                        : IncidentStatus.RESOLVED
+                request.isResolved()
+                        ? IncidentStatus.RESOLVED
+                        : IncidentStatus.IN_REVIEW
         );
 
         setIncidentResolveTime(incident);

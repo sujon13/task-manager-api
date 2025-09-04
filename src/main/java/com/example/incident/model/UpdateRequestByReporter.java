@@ -5,8 +5,6 @@ import lombok.*;
 
 
 @Getter
-@Setter
-@Builder
 @NoArgsConstructor
 @AllArgsConstructor
 public class UpdateRequestByReporter {
@@ -14,4 +12,6 @@ public class UpdateRequestByReporter {
 
     @Size(max = 2048)
     private String remarksByReporter;
+
+    private boolean resolved;
 }

@@ -12,7 +12,6 @@ import lombok.Setter;
 @Entity
 @Table(name = "options")
 @NoArgsConstructor
-@AllArgsConstructor
 public class Option extends Auditable {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

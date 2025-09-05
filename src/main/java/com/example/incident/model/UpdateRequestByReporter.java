@@ -5,8 +5,8 @@ import lombok.*;
 
 
 @Getter
+@Setter
 @NoArgsConstructor
-@AllArgsConstructor
 public class UpdateRequestByReporter {
     private Integer id;
 

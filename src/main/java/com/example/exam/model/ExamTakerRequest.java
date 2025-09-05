@@ -7,7 +7,6 @@ import org.hibernate.validator.constraints.Length;
 
 @Setter
 @Getter
-@Builder
 public class ExamTakerRequest {
     private Integer id;
     @Length(max = 256)

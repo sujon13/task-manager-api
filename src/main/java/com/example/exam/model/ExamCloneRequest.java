@@ -11,14 +11,11 @@ import java.time.LocalDateTime;
 
 @Getter
 @Setter
-@Builder
 @NoArgsConstructor
-@AllArgsConstructor
 public class ExamCloneRequest {
     @NotNull
     private Integer parentExamId;
 
-    @Builder.Default
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm")
     private LocalDateTime startTime = LocalDateTime.now();
 

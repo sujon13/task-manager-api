@@ -11,9 +11,7 @@ import java.time.LocalDateTime;
 
 @Getter
 @Setter
-@Builder
 @NoArgsConstructor
-@AllArgsConstructor
 public class IncidentFilterRequest {
     @Size(max = 64)
     private String reportedBy;

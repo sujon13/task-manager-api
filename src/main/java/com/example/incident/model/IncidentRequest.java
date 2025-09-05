@@ -14,9 +14,7 @@ import java.util.List;
 
 @Getter
 @Setter
-@Builder
 @NoArgsConstructor
-@AllArgsConstructor
 public class IncidentRequest {
     @Size(max = 64)
     private String station;

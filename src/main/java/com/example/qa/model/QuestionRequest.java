@@ -3,7 +3,9 @@ package com.example.qa.model;
 import com.example.qa.enums.QuesTypeEnum;
 import com.example.qa.enums.QuestionVersion;
 import jakarta.validation.constraints.Size;
-import lombok.*;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -11,18 +13,14 @@ import java.util.List;
 
 @Getter
 @Setter
-@Builder
 @NoArgsConstructor
-@AllArgsConstructor
 public class QuestionRequest {
     private Integer id;
     private Integer parentId;
 
     private Integer serial;
 
-    @Builder.Default
     private QuesTypeEnum QuesType = QuesTypeEnum.MCQ;
-    @Builder.Default
     private QuestionVersion version = QuestionVersion.ENGLISH;
 
     private Integer topicId;
@@ -35,8 +33,6 @@ public class QuestionRequest {
     private String explanation;
     private Boolean visible;
 
-    @Builder.Default
     private List<OptionRequest> optionRequests = new ArrayList<>();
-    @Builder.Default
     private List<QuestionRequest> subQuesRequests = new ArrayList<>();
 }

@@ -14,7 +14,6 @@ import lombok.Setter;
         @Index(name = "idx_comments_question_id", columnList = "question_id")
 })
 @NoArgsConstructor
-@AllArgsConstructor
 public class Comment extends Auditable {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

@@ -24,7 +24,6 @@ import java.time.LocalDateTime;
 @Audited
 @Table(name = "incidents")
 @NoArgsConstructor
-@AllArgsConstructor
 public class Incident extends Auditable {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

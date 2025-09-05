@@ -12,9 +12,7 @@ import java.time.LocalDateTime;
 
 @Getter
 @Setter
-@Builder
 @NoArgsConstructor
-@AllArgsConstructor
 public class ExamEditRequest {
     private Integer id;
 

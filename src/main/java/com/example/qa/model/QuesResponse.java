@@ -9,9 +9,7 @@ import java.util.List;
 
 @Getter
 @Setter
-@Builder
 @NoArgsConstructor
-@AllArgsConstructor
 public class QuesResponse extends Auditable {
     private Integer id;
     private Integer parentId;
@@ -29,10 +27,8 @@ public class QuesResponse extends Auditable {
     private Integer likeCount;
     private Integer freqCount;
 
-    @Builder.Default
     private List<OptionResponse> options = new ArrayList<>();
 
-    @Builder.Default
     private List<QuesResponse> subResponses = new ArrayList<>();
 }
 

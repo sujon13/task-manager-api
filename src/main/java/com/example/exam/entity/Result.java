@@ -17,7 +17,6 @@ import lombok.Setter;
         @Index(name = "idx_results_examId_examinee", columnList = "exam_id, examinee")
 })
 @NoArgsConstructor
-@AllArgsConstructor
 public class Result extends Auditable {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

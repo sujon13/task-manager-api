@@ -7,7 +7,6 @@ import org.hibernate.validator.constraints.Length;
 
 @Getter
 @Setter
-@Builder
 public class PostRequest {
     private Integer id;
     @Length(max = 256)

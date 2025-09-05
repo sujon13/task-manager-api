@@ -9,9 +9,7 @@ import java.time.LocalDateTime;
 
 @Getter
 @Setter
-@Builder
 @NoArgsConstructor
-@AllArgsConstructor
 public class ExamAddRequest {
     @NotBlank(message = "Name cannot be empty")
     @Size(max = 127, message = "Name must be 127 characters or less")
@@ -23,7 +21,6 @@ public class ExamAddRequest {
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm")
     private LocalDateTime startTime;
 
-    @Builder.Default
     private int allocatedTimeInMin = 60;
 
     @NotNull

@@ -9,9 +9,7 @@ import java.time.LocalDateTime;
 
 @Getter
 @Setter
-@Builder
 @NoArgsConstructor
-@AllArgsConstructor
 public class PrExamEditRequest {
     private Integer id;
 

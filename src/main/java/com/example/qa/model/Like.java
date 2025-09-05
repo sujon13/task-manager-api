@@ -14,7 +14,6 @@ import lombok.Setter;
 @Entity
 @Table(name = "likes")
 @NoArgsConstructor
-@AllArgsConstructor
 public class Like extends Auditable {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

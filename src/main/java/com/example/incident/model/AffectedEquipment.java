@@ -17,7 +17,6 @@ import org.hibernate.envers.Audited;
         @Index(name = "idx_affected_equipments_incident_id", columnList = "incident_id")
 })
 @NoArgsConstructor
-@AllArgsConstructor
 public class AffectedEquipment extends Auditable {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

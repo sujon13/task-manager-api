@@ -20,7 +20,6 @@ import java.time.LocalDateTime;
 @Entity
 @Table(name = "exams")
 @NoArgsConstructor
-@AllArgsConstructor
 public class Exam extends Auditable {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

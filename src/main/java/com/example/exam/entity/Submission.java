@@ -15,7 +15,6 @@ import lombok.Setter;
 @Entity
 @Table(name = "submissions")
 @NoArgsConstructor
-@AllArgsConstructor
 public class Submission extends Auditable {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

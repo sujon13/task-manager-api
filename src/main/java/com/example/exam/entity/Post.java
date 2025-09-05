@@ -13,7 +13,6 @@ import lombok.Setter;
 @Entity
 @Table(name = "posts")
 @NoArgsConstructor
-@AllArgsConstructor
 public class Post extends Auditable {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

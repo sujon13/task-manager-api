@@ -12,6 +12,4 @@ public class UpdateRequestByReporter {
 
     @Size(max = 2048)
     private String remarksByReporter;
-
-    private boolean resolved;
 }

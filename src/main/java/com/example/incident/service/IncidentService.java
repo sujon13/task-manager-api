@@ -283,25 +283,14 @@ public class IncidentService {
         }
     }
 
-    private void setIncidentResolveTime(Incident incident) {
-        if (IncidentStatus.RESOLVED.equals(incident.getStatus())) {
-            incident.setResolvedAt(LocalDateTime.now());
-        }
-    }
-
     @Transactional
     public void updateIncidentByReporter(final int id, UpdateRequestByReporter request) {
         Incident incident = findById(id);
         checkReporterPermission(incident);
 
         incident.setRemarksByReporter(request.getRemarksByReporter());
-        incident.setStatus(
-                request.isResolved()
-                        ? IncidentStatus.RESOLVED
-                        : IncidentStatus.IN_REVIEW
-        );
-
-        setIncidentResolveTime(incident);
+        incident.setStatus(IncidentStatus.RESOLVED);
+        incident.setResolvedAt(LocalDateTime.now());
     }
 
     private void checkStatusEditPermission(Incident incident, IncidentStatus newStatus) {

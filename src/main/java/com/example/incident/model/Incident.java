@@ -63,18 +63,27 @@ public class Incident extends Auditable {
     @Column(name = "summary", length = 1024)
     private String summary;
 
-    @Column(name = "description", length = 4096)
+    @Column(name = "description", length = 2048)
     private String description;
 
     // actionTakenByScada
 
     // actionTakenByContractor
 
-    @Column(name = "remarks_by_reporter", length = 2048)
+    @Column(name = "remarks_by_reporter", length = 1024)
     private String remarksByReporter;
 
-    @Column(name = "remarks_by_assignee", length = 2048)
+    @Column(name = "remarks_by_assignee", length = 1024)
     private String remarksByAssignee;
+
+    @Column(name = "initial_assignee", length = 64)
+    private String initialAssignee;
+
+    @Column(name = "remarks_by_initial_assignee", length = 1024)
+    private String remarksByInitialAssignee;
+
+    @Column(name = "remarks_by_supervisor", length = 1024)
+    private String remarksBySupervisor;
 
     @Column(name = "status")
     @Convert(converter = IncidentStatusConverter.class)

@@ -112,7 +112,7 @@ public class IncidentService {
 
     private Map<String, UserResponse> getUserNameToResponseMap(List<Incident> incidents) {
         Set<String> userNames = incidents.stream()
-                .flatMap(incident -> Stream.of(incident.getReportedBy(),incident.getAssignedTo()))
+                .flatMap(incident -> Stream.of(incident.getReportedBy(), incident.getAssignedTo(), incident.getInitialAssignee()))
                 .filter(StringUtils::hasText)
                 .collect(Collectors.toUnmodifiableSet());
         List<UserResponse> userResponses = userService.fetchUsers(userNames);
@@ -138,6 +138,15 @@ public class IncidentService {
                         assignedTo,
                         StringUtils.hasText(assignedTo)
                                 ? UserResponse.builder().userName(assignedTo).build()
+                                : null
+                )
+        );
+        final String initialAssignee = incident.getInitialAssignee();
+        incidentResponse.setInitialAssignee(
+                userResponseMap.getOrDefault(
+                        initialAssignee,
+                        StringUtils.hasText(initialAssignee)
+                                ? UserResponse.builder().userName(initialAssignee).build()
                                 : null
                 )
         );
@@ -225,8 +234,6 @@ public class IncidentService {
 
         incident.setSummary(request.getSummary());
         incident.setDescription(request.getDescription());
-        incident.setRemarksByReporter(request.getRemarksByReporter());
-        incident.setRemarksByAssignee(request.getRemarksByAssignee());
 
         if (request.getPriority() != null)
             incident.setPriority(request.getPriority());
@@ -248,7 +255,8 @@ public class IncidentService {
         }
 
         if (!StringUtils.hasText(request.getAssignedTo())) {
-            incident.setStatus(IncidentStatus.REPORTED);
+            if (!IncidentStatus.RETURNED.equals(incident.getStatus()))
+                incident.setStatus(IncidentStatus.REPORTED);
         } else {
             if (!request.getAssignedTo().equals(incident.getAssignedTo())) {
                 incident.setStatus(IncidentStatus.IN_PROGRESS);
@@ -279,26 +287,36 @@ public class IncidentService {
         Incident incident = findById(id);
         checkAssigneePermission(incident);
 
-        incident.setRemarksByAssignee(request.getRemarksByAssignee());
-        incident.setStatus(IncidentStatus.COMPLETED);
+        if (request.isCompleted()) {
+            incident.setRemarksByAssignee(request.getRemarksByAssignee());
+            incident.setStatus(IncidentStatus.COMPLETED);
+        } else {
+            incident.setInitialAssignee(incident.getAssignedTo());
+            incident.setRemarksByInitialAssignee(request.getRemarksByAssignee());
+
+            incident.setAssignedTo(null);
+            incident.setRemarksByAssignee(null);
+
+            incident.setStatus(IncidentStatus.RETURNED);
+        }
     }
 
-    private void checkReporterPermission(Incident incident) {
-        if (!incidentUtil.isReporter(incident)) {
+    private void checkSupervisorPermission(Incident incident) {
+        if (!userUtil.isSupervisor()) {
             throw new AccessDeniedException("You do not have permission to update this incident");
         }
 
-        if (!List.of(IncidentStatus.COMPLETED, IncidentStatus.IN_REVIEW).contains(incident.getStatus())) {
+        if (!IncidentStatus.COMPLETED.equals(incident.getStatus())) {
             throw new AccessDeniedException("You do not have permission to update this incident");
         }
     }
 
     @Transactional
-    public void updateIncidentByReporter(final int id, UpdateRequestByReporter request) {
+    public void updateIncidentBySupervisor(final int id, UpdateRequestBySupervisor request) {
         Incident incident = findById(id);
-        checkReporterPermission(incident);
+        checkSupervisorPermission(incident);
 
-        incident.setRemarksByReporter(request.getRemarksByReporter());
+        incident.setRemarksBySupervisor(request.getRemarksBySupervisor());
         incident.setStatus(IncidentStatus.RESOLVED);
         incident.setResolvedAt(LocalDateTime.now());
     }

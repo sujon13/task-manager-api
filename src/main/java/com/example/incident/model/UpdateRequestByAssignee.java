@@ -11,4 +11,6 @@ public class UpdateRequestByAssignee {
 
     @Size(max = 2048)
     private String remarksByAssignee;
+
+    private boolean completed = false;
 }

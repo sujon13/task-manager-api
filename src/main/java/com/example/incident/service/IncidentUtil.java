@@ -50,7 +50,7 @@ public class IncidentUtil {
 
     public void checkEditPermission(Incident incident) {
         final String userName = userUtil.getUserName();
-        if (!userUtil.hasEditPermission(incident) && !isAssignee(incident, userName)) {
+        if (!userUtil.isSupervisor() && !isAssignee(incident, userName)) {
             log.error("User {} does not have permission to edit incident {}", userName, incident.getId());
             throw new AccessDeniedException("You do not have permission to edit this incident");
         }

@@ -7,9 +7,9 @@ import lombok.*;
 @Getter
 @Setter
 @NoArgsConstructor
-public class UpdateRequestByReporter {
+public class UpdateRequestBySupervisor {
     private Integer id;
 
     @Size(max = 2048)
-    private String remarksByReporter;
+    private String remarksBySupervisor;
 }

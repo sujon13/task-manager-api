@@ -57,9 +57,9 @@ public class IncidentController {
         return ResponseEntity.ok().build();
     }
 
-    @PutMapping("/update-by-reporter/{id}")
-    public ResponseEntity<Void> updateIncidentByReporter(@PathVariable int id, @Valid @RequestBody UpdateRequestByReporter request) {
-        incidentService.updateIncidentByReporter(id, request);
+    @PutMapping("/update-by-supervisor/{id}")
+    public ResponseEntity<Void> updateIncidentBySupervisor(@PathVariable int id, @Valid @RequestBody UpdateRequestBySupervisor request) {
+        incidentService.updateIncidentBySupervisor(id, request);
         return ResponseEntity.ok().build();
     }
 

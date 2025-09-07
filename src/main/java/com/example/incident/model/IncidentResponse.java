@@ -27,6 +27,7 @@ public class IncidentResponse {
 
     private UserResponse reportedBy;
     private UserResponse assignedTo;
+    private UserResponse initialAssignee;
 
     @JsonFormat(pattern = "dd-MM-yyyy HH:mm")
     private LocalDateTime resolvedAt;
@@ -45,8 +46,9 @@ public class IncidentResponse {
     // actionTakenByContractor
     private List<ActionTakenRequest> actionsTakenByAssignee;
 
-    private String remarksByReporter;
+    private String remarksBySupervisor;
     private String remarksByAssignee;
+    private String remarksByInitialAssignee;
     private IncidentStatus status;
     private String statusStr;
     private Priority priority;

@@ -60,6 +60,10 @@ public class UserUtil {
         return hasAnyRole("ADMIN");
     }
 
+    public boolean isSupervisor() {
+        return hasAnyRole(Constants.SCADA_SE, Constants.SMD_XEN);
+    }
+
     public boolean isUser() {
         return hasAnyRole("USER");
     }

@@ -43,7 +43,7 @@ public class IncidentRequest {
     @Size(max = 1024)
     private String summary;
 
-    @Size(max = 4096)
+    @Size(max = 2048)
     private String description;
 
     // actionTakenByScada
@@ -52,11 +52,11 @@ public class IncidentRequest {
     // actionTakenByContractor
     private List<ActionTakenRequest> actionsTakenByAssignee = List.of();
 
-    @Size(max = 2048)
-    private String remarksByReporter;
-
-    @Size(max = 2048)
-    private String remarksByAssignee;
+//    @Size(max = 2048)
+//    private String remarksByReporter;
+//
+//    @Size(max = 2048)
+//    private String remarksByAssignee;
 
     private IncidentStatus status = IncidentStatus.REPORTED;
 

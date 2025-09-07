@@ -124,12 +124,22 @@ public class IncidentService {
                                                   Map<String, UserResponse> userResponseMap) {
         final String reportedBy = incident.getReportedBy();
         incidentResponse.setReportedBy(
-                userResponseMap.getOrDefault(reportedBy, UserResponse.builder().userName(reportedBy).build())
+                userResponseMap.getOrDefault(
+                        reportedBy,
+                        StringUtils.hasText(reportedBy)
+                                ? UserResponse.builder().userName(reportedBy).build()
+                                : null
+                )
         );
 
         final String assignedTo = incident.getAssignedTo();
         incidentResponse.setAssignedTo(
-                userResponseMap.getOrDefault(assignedTo, UserResponse.builder().userName(assignedTo).build())
+                userResponseMap.getOrDefault(
+                        assignedTo,
+                        StringUtils.hasText(assignedTo)
+                                ? UserResponse.builder().userName(assignedTo).build()
+                                : null
+                )
         );
     }
 
@@ -174,9 +184,9 @@ public class IncidentService {
         incident.setReportedBy(userUtil.getUserName());
 
         incident.setStatus(
-                incident.getAssignedTo() != null
-                        ? IncidentStatus.IN_PROGRESS
-                        : IncidentStatus.REPORTED
+                StringUtils.hasText(incident.getAssignedTo())
+                    ? IncidentStatus.IN_PROGRESS
+                    : IncidentStatus.REPORTED
         );
         return incident;
     }

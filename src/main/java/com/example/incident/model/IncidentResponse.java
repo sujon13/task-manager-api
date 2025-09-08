@@ -28,6 +28,7 @@ public class IncidentResponse {
     private UserResponse reportedBy;
     private UserResponse assignedTo;
     private UserResponse initialAssignee;
+    private UserResponse pendingTo;
 
     @JsonFormat(pattern = "dd-MM-yyyy HH:mm")
     private LocalDateTime resolvedAt;

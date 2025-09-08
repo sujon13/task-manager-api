@@ -9,5 +9,6 @@ public class Constants {
 
     public static final String SCADA_SE = "SCADA_SE";
     public static final String SMD_XEN = "SMD_XEN";
+    public static final String SMD_XEN_USER_NAME = "xen.scada";
 
 }

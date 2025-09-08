@@ -8,6 +8,7 @@ import com.example.incident.enums.Priority;
 import com.example.incident.model.*;
 import com.example.incident.repository.IncidentRepository;
 import com.example.incident.specification.IncidentSpecification;
+import com.example.util.Constants;
 import com.example.util.UserUtil;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -114,7 +115,8 @@ public class IncidentService {
         Set<String> userNames = incidents.stream()
                 .flatMap(incident -> Stream.of(incident.getReportedBy(), incident.getAssignedTo(), incident.getInitialAssignee()))
                 .filter(StringUtils::hasText)
-                .collect(Collectors.toUnmodifiableSet());
+                .collect(Collectors.toSet());
+        userNames.add(Constants.SMD_XEN_USER_NAME);
         List<UserResponse> userResponses = userService.fetchUsers(userNames);
         return userResponses.stream()
                 .collect(Collectors.toMap(UserResponse::getUserName, Function.identity()));
@@ -152,12 +154,21 @@ public class IncidentService {
         );
     }
 
+    private UserResponse choosePendingTo(IncidentResponse response, UserResponse smdXenUserResponse) {
+        return switch (response.getStatus()) {
+            case REPORTED, COMPLETED, RETURNED -> smdXenUserResponse;
+            case IN_PROGRESS -> response.getAssignedTo();
+            default -> null;
+        };
+    }
+
     private Page<IncidentResponse> buildIncidentResponses(Page<Incident> incidents) {
         List<Integer> incidentIds = incidents.stream().map(Incident::getId).toList();
         Map<Integer, List<String>> affectedEquipmentMap = affectedEquipmentService.getAffectedEquipmentMap(incidentIds);
         Map<Integer, List<ActionsTaken>> actionsTakenMap = actionsTakenService.findIncidentIdToActionsTakenMap(incidentIds);
         Map<String, UserResponse> userNameToUserResponseMap = getUserNameToResponseMap(incidents.toList());
 
+        final UserResponse smdXenUserResponse = userNameToUserResponseMap.get(Constants.SMD_XEN_USER_NAME);
         final String me = userUtil.getUserName();
         List<IncidentResponse> incidentResponses = incidents.stream()
                 .map(incident -> buildIncidentResponse(
@@ -167,6 +178,7 @@ public class IncidentService {
                         userNameToUserResponseMap)
                 )
                 .peek(incidentResponse -> checkAndSetIfLoggedInUserIsReporterOrAssignee(incidentResponse, me))
+                .peek(incidentResponse -> incidentResponse.setPendingTo(choosePendingTo(incidentResponse, smdXenUserResponse)))
                 .toList();
         return new PageImpl<>(incidentResponses, incidents.getPageable(), incidents.getTotalElements());
     }

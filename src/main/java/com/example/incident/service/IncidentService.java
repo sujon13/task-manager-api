@@ -55,7 +55,7 @@ public class IncidentService {
 
     private void save(Incident incident) {
         incidentRepository.save(incident);
-        incidentStatusTrackerService.addIncidentStatus(incident, null, IncidentStatus.REPORTED);
+        incidentStatusTrackerService.addIncidentStatus(incident, null, incident.getStatus());
     }
 
     private void addActionsTaken(IncidentResponse incidentResponse, Incident incident, List<ActionsTaken> actionsTakenList) {
@@ -260,6 +260,11 @@ public class IncidentService {
             actionsTakenService.updateActionsTaken(incident.getId(), userName, request.getActionsTakenByAssignee());
     }
 
+    private void updateIncidentStatus(Incident incident, IncidentStatus newStatus) {
+        incidentStatusTrackerService.addIncidentStatus(incident, newStatus);
+        incident.setStatus(newStatus);
+    }
+
     private void updateStatusDueToAssigneeChange(Incident incident, IncidentRequest request) {
         if (!StringUtils.hasText(incident.getAssignedTo()) && !StringUtils.hasText(request.getAssignedTo())) {
             // no change in assignee
@@ -267,11 +272,14 @@ public class IncidentService {
         }
 
         if (!StringUtils.hasText(request.getAssignedTo())) {
-            if (!IncidentStatus.RETURNED.equals(incident.getStatus()))
-                incident.setStatus(IncidentStatus.REPORTED);
+            if (!IncidentStatus.RETURNED.equals(incident.getStatus())) {
+                // this should not occur
+                updateIncidentStatus(incident, IncidentStatus.REPORTED);
+            }
         } else {
             if (!request.getAssignedTo().equals(incident.getAssignedTo())) {
-                incident.setStatus(IncidentStatus.IN_PROGRESS);
+                // this is a usual case
+                updateIncidentStatus(incident, IncidentStatus.IN_PROGRESS);
             }
         }
     }
@@ -301,7 +309,7 @@ public class IncidentService {
 
         if (request.isCompleted()) {
             incident.setRemarksByAssignee(request.getRemarksByAssignee());
-            incident.setStatus(IncidentStatus.COMPLETED);
+            updateIncidentStatus(incident, IncidentStatus.COMPLETED);
         } else {
             incident.setInitialAssignee(incident.getAssignedTo());
             incident.setRemarksByInitialAssignee(request.getRemarksByAssignee());
@@ -309,7 +317,7 @@ public class IncidentService {
             incident.setAssignedTo(null);
             incident.setRemarksByAssignee(null);
 
-            incident.setStatus(IncidentStatus.RETURNED);
+            updateIncidentStatus(incident, IncidentStatus.RETURNED);
         }
     }
 
@@ -329,7 +337,7 @@ public class IncidentService {
         checkSupervisorPermission(incident);
 
         incident.setRemarksBySupervisor(request.getRemarksBySupervisor());
-        incident.setStatus(IncidentStatus.RESOLVED);
+        updateIncidentStatus(incident, IncidentStatus.RESOLVED);
         incident.setResolvedAt(LocalDateTime.now());
     }
 
@@ -337,21 +345,6 @@ public class IncidentService {
         if (IncidentStatus.RESOLVED.equals(newStatus) && incidentUtil.isAssignee(incident)) {
             throw new AccessDeniedException("You do not have permission to resolve this incident");
         }
-    }
-
-    private void updateIncidentStatus(Incident incident, IncidentRequest updateRequest) {
-        incidentStatusTrackerService.addIncidentStatus(incident, updateRequest.getStatus());
-        incident.setStatus(updateRequest.getStatus());
-    }
-
-    @Transactional
-    public IncidentResponse updateIncidentStatus(final int id, IncidentRequest updateRequest) {
-        Incident incident = findById(id);
-        incidentUtil.checkEditPermission(incident); // creator, admin or assignee
-        checkStatusEditPermission(incident, updateRequest.getStatus()); // assignee can not resolve incident
-
-        updateIncidentStatus(incident, updateRequest);
-        return buildIncidentResponse(incident);
     }
 
     @Transactional

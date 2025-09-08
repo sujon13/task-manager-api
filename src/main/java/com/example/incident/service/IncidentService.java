@@ -44,10 +44,6 @@ public class IncidentService {
     private final UserService userService;
 
 
-    public List<Incident> findAllByIds(List<Integer> ids) {
-        return incidentRepository.findAllById(ids);
-    }
-
     public Incident findById(int id) {
         return incidentRepository.findById(id)
                 .orElseThrow(() -> new NotFoundException("Incident not found with id " + id));
@@ -353,26 +349,5 @@ public class IncidentService {
         affectedEquipmentService.deleteByIncidentId(id);
         actionsTakenService.deleteAllByIncidentId(id);
         incidentRepository.deleteById(id);
-    }
-
-    // util
-    private CustomDropdown buildDropdown(final Priority priority) {
-        return new CustomDropdown(priority.getName(), priority.getDisplayName());
-    }
-
-    private CustomDropdown buildDropdown(final IncidentStatus incidentStatus) {
-        return new CustomDropdown(incidentStatus.getName(), incidentStatus.getDisplayName());
-    }
-
-    public List<CustomDropdown> getPriorityDropdown() {
-        return Arrays.stream(Priority.values())
-                .map(this::buildDropdown)
-                .toList();
-    }
-
-    public List<CustomDropdown> getStatusDropdown() {
-        return Arrays.stream(IncidentStatus.values())
-                .map(this::buildDropdown)
-                .toList();
     }
 }

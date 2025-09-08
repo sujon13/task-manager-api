@@ -2,6 +2,7 @@ package com.example.incident.controller;
 
 import com.example.incident.model.*;
 import com.example.incident.service.IncidentService;
+import com.example.incident.service.IncidentUtil;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -22,6 +23,7 @@ import java.util.List;
 @RequestMapping("/api/v1/incidents")
 public class IncidentController {
     private final IncidentService incidentService;
+    private final IncidentUtil incidentUtil;
 
 
     @GetMapping("")
@@ -71,12 +73,12 @@ public class IncidentController {
 
     @GetMapping("/priority/dropdown")
     public List<CustomDropdown> getPriorityDropdown() {
-        return incidentService.getPriorityDropdown();
+        return incidentUtil.getPriorityDropdown();
     }
 
     @GetMapping("/status/dropdown")
     public List<CustomDropdown> getStatusDropdown() {
-        return incidentService.getStatusDropdown();
+        return incidentUtil.getStatusDropdown();
     }
 
 }

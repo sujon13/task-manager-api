@@ -1,5 +1,6 @@
 package com.example.incident.service;
 
+import com.example.incident.enums.IncidentStatus;
 import com.example.incident.model.Incident;
 import com.example.util.UserUtil;
 import lombok.RequiredArgsConstructor;
@@ -50,7 +51,9 @@ public class IncidentUtil {
 
     public void checkEditPermission(Incident incident) {
         final String userName = userUtil.getUserName();
-        if (!userUtil.isSupervisor() && !isAssignee(incident, userName)) {
+        if (userUtil.isSupervisor() || isAssignee(incident, userName) ||
+                (isReporter(incident, userName) && IncidentStatus.REPORTED.equals(incident.getStatus()))
+        ) {} else {
             log.error("User {} does not have permission to edit incident {}", userName, incident.getId());
             throw new AccessDeniedException("You do not have permission to edit this incident");
         }

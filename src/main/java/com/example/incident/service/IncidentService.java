@@ -4,7 +4,6 @@ import com.example.auth.model.UserResponse;
 import com.example.auth.service.UserService;
 import com.example.exception.NotFoundException;
 import com.example.incident.enums.IncidentStatus;
-import com.example.incident.enums.Priority;
 import com.example.incident.model.*;
 import com.example.incident.repository.IncidentRepository;
 import com.example.incident.specification.IncidentSpecification;
@@ -24,7 +23,9 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
 
 import java.time.LocalDateTime;
-import java.util.*;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;

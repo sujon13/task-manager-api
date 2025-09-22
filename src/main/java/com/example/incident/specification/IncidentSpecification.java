@@ -45,6 +45,20 @@ public class IncidentSpecification {
                         : cb.lessThanOrEqualTo(root.get("reportedAt"), to);
     }
 
+    private static Specification<Incident> hasResolvedAtFrom(LocalDateTime from) {
+        return (root, query, cb) ->
+                from == null
+                        ? null
+                        : cb.greaterThanOrEqualTo(root.get("resolvedAt"), from);
+    }
+
+    private static Specification<Incident> hasResolvedAtTo(LocalDateTime to) {
+        return (root, query, cb) ->
+                to == null
+                        ? null
+                        : cb.lessThanOrEqualTo(root.get("resolvedAt"), to);
+    }
+
 
     public static Specification<Incident> buildSpecification(IncidentFilterRequest request) {
         return Specification
@@ -53,6 +67,8 @@ public class IncidentSpecification {
                 .and(hasPriority(request.getPriority()))
                 .and(hasStatus(request.getStatus()))
                 .and(hasReportedAtFrom(request.getReportedAtFrom()))
-                .and(hasReportedAtTo(request.getReportedAtTo()));
+                .and(hasReportedAtTo(request.getReportedAtTo()))
+                .and(hasResolvedAtFrom(request.getResolvedAtFrom()))
+                .and(hasResolvedAtTo(request.getResolvedAtTo()));
     }
 }

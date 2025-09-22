@@ -29,6 +29,12 @@ public class IncidentFilterRequest {
     @JsonFormat(pattern = "dd-MM-yyyy HH:mm")
     private LocalDateTime reportedAtTo;
 
+    @JsonFormat(pattern = "dd-MM-yyyy HH:mm")
+    private LocalDateTime resolvedAtFrom;
+
+    @JsonFormat(pattern = "dd-MM-yyyy HH:mm")
+    private LocalDateTime resolvedAtTo;
+
     public void setReportedBy(String value) {
         if (value == null || value.equalsIgnoreCase("null") || value.isBlank()) {
             this.reportedBy = null;
@@ -74,6 +80,22 @@ public class IncidentFilterRequest {
             this.reportedAtTo = null;
         } else {
             this.reportedAtTo = DateUtil.parseDate(value);
+        }
+    }
+
+    public void setResolvedAtFrom(String value) {
+        if (value == null || value.equalsIgnoreCase("null") || value.isBlank()) {
+            this.resolvedAtFrom = null;
+        } else {
+            this.resolvedAtFrom = DateUtil.parseDate(value);
+        }
+    }
+
+    public void setResolvedAtTo(String value) {
+        if (value == null || value.equalsIgnoreCase("null") || value.isBlank()) {
+            this.resolvedAtTo = null;
+        } else {
+            this.resolvedAtTo = DateUtil.parseDate(value);
         }
     }
 }

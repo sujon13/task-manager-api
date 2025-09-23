@@ -13,8 +13,7 @@ public enum IncidentStatus {
     IN_PROGRESS(1, "In Progress"),
     COMPLETED(2, "Completed"),
     RETURNED(3, "Returned"),
-    IN_REVIEW(4, "Under Observation"),
-    RESOLVED(5, "Resolved");
+    RESOLVED(4, "Resolved");
 
     private static final Map<Integer, IncidentStatus> mapByValue;
 

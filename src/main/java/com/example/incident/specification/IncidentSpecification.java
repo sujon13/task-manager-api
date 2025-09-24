@@ -59,11 +59,11 @@ public class IncidentSpecification {
                         : cb.lessThanOrEqualTo(root.get("resolvedAt"), to);
     }
 
-
     public static Specification<Incident> buildSpecification(IncidentFilterRequest request) {
         return Specification
                 .where(hasData(request.getReportedBy(), "reportedBy"))
                 .and(hasData(request.getAssignedTo(), "assignedTo"))
+                .and(hasData(request.getPendingTo(), "pendingTo"))
                 .and(hasPriority(request.getPriority()))
                 .and(hasStatus(request.getStatus()))
                 .and(hasReportedAtFrom(request.getReportedAtFrom()))

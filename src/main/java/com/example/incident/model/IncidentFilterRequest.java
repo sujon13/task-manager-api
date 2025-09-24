@@ -19,6 +19,9 @@ public class IncidentFilterRequest {
     @Size(max = 64)
     private String assignedTo;
 
+    @Size(max = 64)
+    private String pendingTo;
+
     private IncidentStatus status;
 
     private Priority priority;
@@ -48,6 +51,14 @@ public class IncidentFilterRequest {
             this.assignedTo = null;
         }  else {
             this.assignedTo = value;
+        }
+    }
+
+    public void setPendingTo(String value) {
+        if (value == null || value.equalsIgnoreCase("null") || value.isBlank()) {
+            this.pendingTo = null;
+        }  else {
+            this.pendingTo = value;
         }
     }
 

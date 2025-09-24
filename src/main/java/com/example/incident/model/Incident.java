@@ -50,6 +50,9 @@ public class Incident extends Auditable {
     @Column(name = "assigned_to", length = 64)
     private String assignedTo;
 
+    @Column(name = "pending_to", length = 64)
+    private String pendingTo;
+
     @Column(name = "resolved_at")
     private LocalDateTime resolvedAt;
 

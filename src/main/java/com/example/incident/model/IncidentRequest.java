@@ -1,12 +1,15 @@
 package com.example.incident.model;
 
 import com.example.incident.enums.FaultNature;
+import com.example.incident.enums.IncidentCategory;
 import com.example.incident.enums.IncidentStatus;
 import com.example.incident.enums.Priority;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.Size;
-import lombok.*;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -61,6 +64,8 @@ public class IncidentRequest {
     private IncidentStatus status = IncidentStatus.REPORTED;
 
     private Priority priority = Priority.HIGH;
+
+    private IncidentCategory category;
 
     // category
     // sub-category

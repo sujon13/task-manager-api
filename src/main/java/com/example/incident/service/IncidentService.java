@@ -84,6 +84,13 @@ public class IncidentService {
         IncidentResponse incidentResponse = new IncidentResponse();
         BeanUtils.copyProperties(incident, incidentResponse);
         incidentResponse.setStatusStr(incident.getStatus().getDisplayName());
+        incidentResponse.setPriorityStr(incident.getPriority().getDisplayName());
+        incidentResponse.setCategory(incident.getCategory());
+        incidentResponse.setCategoryStr(
+                incident.getCategory() != null
+                        ? incident.getCategory().getDisplayName()
+                        : null
+        );
 
         setUserDetailsToIncidentResponse(incidentResponse, incident, userNameToUserResponseMap);
 
@@ -273,6 +280,8 @@ public class IncidentService {
 
         if (request.getPriority() != null)
             incident.setPriority(request.getPriority());
+
+        incident.setCategory(request.getCategory());
     }
 
     private void updateActionsTaken(Incident incident, IncidentRequest request) {

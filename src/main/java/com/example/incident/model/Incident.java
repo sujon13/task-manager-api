@@ -1,9 +1,11 @@
 package com.example.incident.model;
 
+import com.example.incident.converter.CategoryConverter;
 import com.example.incident.converter.FaultNatureConverter;
 import com.example.incident.converter.IncidentStatusConverter;
 import com.example.incident.converter.PriorityConverter;
 import com.example.incident.enums.FaultNature;
+import com.example.incident.enums.IncidentCategory;
 import com.example.incident.enums.IncidentStatus;
 import com.example.incident.enums.Priority;
 import com.example.qa.model.Auditable;
@@ -97,6 +99,9 @@ public class Incident extends Auditable {
     private Priority priority = Priority.HIGH;
 
     // category
+    @Column(name = "category")
+    @Convert(converter = CategoryConverter.class)
+    private IncidentCategory category;
     // sub-category
 
 }

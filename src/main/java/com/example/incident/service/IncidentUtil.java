@@ -1,5 +1,6 @@
 package com.example.incident.service;
 
+import com.example.incident.enums.IncidentCategory;
 import com.example.incident.enums.IncidentStatus;
 import com.example.incident.enums.Priority;
 import com.example.incident.model.CustomDropdown;
@@ -11,6 +12,7 @@ import org.springframework.security.access.AccessDeniedException;
 import org.springframework.stereotype.Service;
 
 import java.util.Arrays;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Objects;
 
@@ -71,6 +73,10 @@ public class IncidentUtil {
         return new CustomDropdown(incidentStatus.getName(), incidentStatus.getDisplayName());
     }
 
+    private CustomDropdown buildDropdown(final IncidentCategory incidentCategory) {
+        return new CustomDropdown(incidentCategory.getName(), incidentCategory.getDisplayName());
+    }
+
     public List<CustomDropdown> getPriorityDropdown() {
         return Arrays.stream(Priority.values())
                 .map(this::buildDropdown)
@@ -79,6 +85,13 @@ public class IncidentUtil {
 
     public List<CustomDropdown> getStatusDropdown() {
         return Arrays.stream(IncidentStatus.values())
+                .map(this::buildDropdown)
+                .toList();
+    }
+
+    public List<CustomDropdown> getCategoryDropdown() {
+        return Arrays.stream(IncidentCategory.values())
+                .sorted(Comparator.comparing(IncidentCategory::getName))
                 .map(this::buildDropdown)
                 .toList();
     }

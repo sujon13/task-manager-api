@@ -1,5 +1,6 @@
 package com.example.incident.model;
 
+import com.example.incident.enums.IncidentCategory;
 import com.example.incident.enums.IncidentStatus;
 import com.example.incident.enums.Priority;
 import com.example.util.DateUtil;
@@ -25,6 +26,8 @@ public class IncidentFilterRequest {
     private IncidentStatus status;
 
     private Priority priority;
+
+    private IncidentCategory category;
 
     @JsonFormat(pattern = "dd-MM-yyyy HH:mm")
     private LocalDateTime reportedAtFrom;
@@ -107,6 +110,14 @@ public class IncidentFilterRequest {
             this.resolvedAtTo = null;
         } else {
             this.resolvedAtTo = DateUtil.parseDate(value);
+        }
+    }
+
+    public void setCategory(String value) {
+        if (value == null || value.equalsIgnoreCase("null") || value.isBlank()) {
+            this.category = null;
+        } else {
+            this.category = IncidentCategory.valueOf(value.toUpperCase());
         }
     }
 }

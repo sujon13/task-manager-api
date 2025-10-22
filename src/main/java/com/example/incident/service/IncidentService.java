@@ -281,7 +281,8 @@ public class IncidentService {
         if (request.getPriority() != null)
             incident.setPriority(request.getPriority());
 
-        incident.setCategory(request.getCategory());
+        if (request.getCategory() != null)
+            incident.setCategory(request.getCategory());
     }
 
     private void updateActionsTaken(Incident incident, IncidentRequest request) {

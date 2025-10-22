@@ -18,7 +18,9 @@ public enum IncidentCategory {
     TELECOM_ABB(6, "Telecom-ABB"),
     TELECOM_GE(7, "Telecom-GE"),
     SCADA_DB_MODELING(8, "SCADA Database Modeling"),
-    DISPLAY(9, "Display");
+    DISPLAY(9, "Display"),
+    LOAD_SHED_FEEDER(10, "Load Shed Feeder"),
+    OTHER(11, "other");
 
 
     private static final Map<Integer, IncidentCategory> mapByValue;

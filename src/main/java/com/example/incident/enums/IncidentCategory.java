@@ -19,8 +19,9 @@ public enum IncidentCategory {
     TELECOM_GE(7, "Telecom-GE"),
     SCADA_DB_MODELING(8, "SCADA Database Modeling"),
     DISPLAY(9, "Display"),
-    LOAD_SHED_FEEDER(10, "Load Shed Feeder"),
-    OTHER(11, "other");
+    LS_FEEDER(10, "LS Feeder"),
+    BROWSER(11, "Browser"),
+    OTHER(12, "other");
 
 
     private static final Map<Integer, IncidentCategory> mapByValue;

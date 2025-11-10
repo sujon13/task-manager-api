@@ -186,9 +186,15 @@ public class IncidentService {
                     if (response.getPendingTo() == null) {
                         return true;
                     } else if (isSupervisor) {
-                        if (isSeScada && incidentUtil.isPendingToSuperVisor(response)) return false;
-                        if (isSmdXen && Constants.SMD_XEN_USER_NAME.equals(response.getPendingTo().getUserName())) return false;
-                        if (isCnstXen && Constants.CNST_XEN_USER_NAME.equals(response.getPendingTo().getUserName())) return false;
+                        if (isSeScada) {
+                            return !incidentUtil.isPendingToSuperVisor(response);
+                        }
+                        if (isSmdXen) {
+                            return !Constants.SMD_XEN_USER_NAME.equals(response.getPendingTo().getUserName());
+                        }
+                        if (isCnstXen) {
+                            return !Constants.CNST_XEN_USER_NAME.equals(response.getPendingTo().getUserName());
+                        }
                         return true;
                     } else {
                         return !me.equals(response.getPendingTo().getUserName());

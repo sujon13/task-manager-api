@@ -177,25 +177,13 @@ public class IncidentService {
 
     private List<IncidentResponse> makeSorted(List<IncidentResponse> incidentResponses) {
         final String me = userUtil.getUserName();
-        final boolean isSupervisor = userUtil.isSupervisor();
         final boolean isSeScada = userUtil.isSeScada();
-        final boolean isSmdXen = userUtil.isSmdXen();
-        final boolean isCnstXen = userUtil.isCnstXen();
         return incidentResponses.stream()
                 .sorted(Comparator.comparing(response -> {
                     if (response.getPendingTo() == null) {
                         return true;
-                    } else if (isSupervisor) {
-                        if (isSeScada) {
-                            return !incidentUtil.isPendingToSuperVisor(response);
-                        }
-                        if (isSmdXen) {
-                            return !Constants.SMD_XEN_USER_NAME.equals(response.getPendingTo().getUserName());
-                        }
-                        if (isCnstXen) {
-                            return !Constants.CNST_XEN_USER_NAME.equals(response.getPendingTo().getUserName());
-                        }
-                        return true;
+                    } else if (isSeScada) {
+                        return !incidentUtil.isPendingToSuperVisor(response);
                     } else {
                         return !me.equals(response.getPendingTo().getUserName());
                     }

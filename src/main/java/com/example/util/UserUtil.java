@@ -68,14 +68,6 @@ public class UserUtil {
         return hasAnyRole(Constants.SCADA_SE);
     }
 
-    public boolean isSmdXen() {
-        return hasAnyRole(Constants.SMD_XEN);
-    }
-
-    public boolean isCnstXen() {
-        return hasAnyRole(Constants.CNST_XEN);
-    }
-
     public boolean isUser() {
         return hasAnyRole("USER");
     }

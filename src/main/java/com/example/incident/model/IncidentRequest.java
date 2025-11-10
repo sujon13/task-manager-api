@@ -1,9 +1,6 @@
 package com.example.incident.model;
 
-import com.example.incident.enums.FaultNature;
-import com.example.incident.enums.IncidentCategory;
-import com.example.incident.enums.IncidentStatus;
-import com.example.incident.enums.Priority;
+import com.example.incident.enums.*;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.Size;
@@ -66,6 +63,8 @@ public class IncidentRequest {
     private Priority priority = Priority.HIGH;
 
     private IncidentCategory category;
+
+    private Division division = Division.SCADA;
 
     // category
     // sub-category

@@ -91,6 +91,7 @@ public class IncidentService {
                         ? incident.getCategory().getDisplayName()
                         : null
         );
+        incidentResponse.setDivision(incident.getDivision());
 
         setUserDetailsToIncidentResponse(incidentResponse, incident, userNameToUserResponseMap);
 
@@ -283,6 +284,9 @@ public class IncidentService {
 
         if (request.getCategory() != null)
             incident.setCategory(request.getCategory());
+
+        if (request.getDivision() != null)
+            incident.setDivision(request.getDivision());
     }
 
     private void updateActionsTaken(Incident incident, IncidentRequest request) {

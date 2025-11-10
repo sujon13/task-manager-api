@@ -1,5 +1,6 @@
 package com.example.incident.specification;
 
+import com.example.incident.enums.Division;
 import com.example.incident.enums.IncidentCategory;
 import com.example.incident.enums.IncidentStatus;
 import com.example.incident.enums.Priority;
@@ -39,6 +40,13 @@ public class IncidentSpecification {
                         : cb.equal(root.get("category"), category);
     }
 
+    private static Specification<Incident> hasDivision(Division division) {
+        return (root, query, cb) ->
+                division == null
+                        ? null
+                        : cb.equal(root.get("division"), division);
+    }
+
     private static Specification<Incident> hasReportedAtFrom(LocalDateTime from) {
         return (root, query, cb) ->
                 from == null
@@ -75,6 +83,7 @@ public class IncidentSpecification {
                 .and(hasPriority(request.getPriority()))
                 .and(hasStatus(request.getStatus()))
                 .and(hasCategory(request.getCategory()))
+                .and(hasDivision(request.getDivision()))
                 .and(hasReportedAtFrom(request.getReportedAtFrom()))
                 .and(hasReportedAtTo(request.getReportedAtTo()))
                 .and(hasResolvedAtFrom(request.getResolvedAtFrom()))

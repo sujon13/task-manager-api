@@ -1,5 +1,6 @@
 package com.example.incident.service;
 
+import com.example.incident.enums.Division;
 import com.example.incident.enums.IncidentCategory;
 import com.example.incident.enums.IncidentStatus;
 import com.example.incident.enums.Priority;
@@ -77,6 +78,10 @@ public class IncidentUtil {
         return new CustomDropdown(incidentCategory.getName(), incidentCategory.getDisplayName());
     }
 
+    private CustomDropdown buildDropdown(final Division division) {
+        return new CustomDropdown(division.getName(), division.getDisplayName());
+    }
+
     public List<CustomDropdown> getPriorityDropdown() {
         return Arrays.stream(Priority.values())
                 .map(this::buildDropdown)
@@ -95,4 +100,11 @@ public class IncidentUtil {
                 .map(this::buildDropdown)
                 .toList();
     }
+
+    public List<CustomDropdown> getDivisionDropdown() {
+        return Arrays.stream(Division.values())
+                .map(this::buildDropdown)
+                .toList();
+    }
+
 }

@@ -86,4 +86,9 @@ public class IncidentController {
         return incidentUtil.getCategoryDropdown();
     }
 
+    @GetMapping("/division/dropdown")
+    public List<CustomDropdown> getDivisionDropdown() {
+        return incidentUtil.getDivisionDropdown();
+    }
+
 }

@@ -1,10 +1,7 @@
 package com.example.incident.model;
 
 import com.example.auth.model.UserResponse;
-import com.example.incident.enums.FaultNature;
-import com.example.incident.enums.IncidentCategory;
-import com.example.incident.enums.IncidentStatus;
-import com.example.incident.enums.Priority;
+import com.example.incident.enums.*;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.*;
 
@@ -57,6 +54,7 @@ public class IncidentResponse {
     private String priorityStr;
     private IncidentCategory category;
     private String categoryStr;
+    private Division division;
 
     // is Reporter or Assignee
     private boolean isReporter = false;

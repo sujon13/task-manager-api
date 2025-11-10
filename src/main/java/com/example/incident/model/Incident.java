@@ -1,13 +1,7 @@
 package com.example.incident.model;
 
-import com.example.incident.converter.CategoryConverter;
-import com.example.incident.converter.FaultNatureConverter;
-import com.example.incident.converter.IncidentStatusConverter;
-import com.example.incident.converter.PriorityConverter;
-import com.example.incident.enums.FaultNature;
-import com.example.incident.enums.IncidentCategory;
-import com.example.incident.enums.IncidentStatus;
-import com.example.incident.enums.Priority;
+import com.example.incident.converter.*;
+import com.example.incident.enums.*;
 import com.example.qa.model.Auditable;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
@@ -103,6 +97,10 @@ public class Incident extends Auditable {
     @Convert(converter = CategoryConverter.class)
     private IncidentCategory category;
     // sub-category
+
+    @Column(name = "division")
+    @Convert(converter = DivisionConverter.class)
+    private Division division = Division.SCADA;
 
 }
 

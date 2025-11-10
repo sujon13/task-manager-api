@@ -1,5 +1,6 @@
 package com.example.incident.model;
 
+import com.example.incident.enums.Division;
 import com.example.incident.enums.IncidentCategory;
 import com.example.incident.enums.IncidentStatus;
 import com.example.incident.enums.Priority;
@@ -28,6 +29,8 @@ public class IncidentFilterRequest {
     private Priority priority;
 
     private IncidentCategory category;
+
+    private Division division;
 
     @JsonFormat(pattern = "dd-MM-yyyy HH:mm")
     private LocalDateTime reportedAtFrom;
@@ -118,6 +121,14 @@ public class IncidentFilterRequest {
             this.category = null;
         } else {
             this.category = IncidentCategory.valueOf(value.toUpperCase());
+        }
+    }
+
+    public void setDivision(String value) {
+        if (value == null || value.equalsIgnoreCase("null") || value.isBlank()) {
+            this.division = null;
+        } else {
+            this.division = Division.valueOf(value.toUpperCase());
         }
     }
 }

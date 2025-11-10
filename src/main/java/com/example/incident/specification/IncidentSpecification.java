@@ -6,10 +6,12 @@ import com.example.incident.enums.IncidentStatus;
 import com.example.incident.enums.Priority;
 import com.example.incident.model.Incident;
 import com.example.incident.model.IncidentFilterRequest;
+import org.apache.commons.collections4.CollectionUtils;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.util.StringUtils;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 public class IncidentSpecification {
     private static Specification<Incident> hasData(final String data, final String entityField) {
@@ -75,11 +77,20 @@ public class IncidentSpecification {
                         : cb.lessThanOrEqualTo(root.get("resolvedAt"), to);
     }
 
+    public static Specification<Incident> hasPendingTo(List<String> pendingToList) {
+        return (root, query, cb) -> {
+            if (CollectionUtils.isEmpty(pendingToList)) {
+                return cb.conjunction(); // no filter
+            }
+            return root.get("pendingTo").in(pendingToList);
+        };
+    }
+
     public static Specification<Incident> buildSpecification(IncidentFilterRequest request) {
         return Specification
                 .where(hasData(request.getReportedBy(), "reportedBy"))
                 .and(hasData(request.getAssignedTo(), "assignedTo"))
-                .and(hasData(request.getPendingTo(), "pendingTo"))
+                .and(hasPendingTo(request.getPendingToList()))
                 .and(hasPriority(request.getPriority()))
                 .and(hasStatus(request.getStatus()))
                 .and(hasCategory(request.getCategory()))

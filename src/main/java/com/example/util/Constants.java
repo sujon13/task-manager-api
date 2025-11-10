@@ -9,7 +9,9 @@ public class Constants {
 
     public static final String SCADA_SE = "SCADA_SE";
     public static final String SMD_XEN = "SMD_XEN";
+    public static final String CNST_XEN = "CNST_XEN";
     public static final String SMD_XEN_USER_NAME = "xen.scada";
+    public static final String CNST_XEN_USER_NAME = "cnst.scada";
     public static final String SCADA_SE_USER_NAME = "se.scada";
 
 }

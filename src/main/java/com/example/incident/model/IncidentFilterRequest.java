@@ -10,6 +10,7 @@ import jakarta.validation.constraints.Size;
 import lombok.*;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 @Getter
 @Setter
@@ -21,8 +22,7 @@ public class IncidentFilterRequest {
     @Size(max = 64)
     private String assignedTo;
 
-    @Size(max = 64)
-    private String pendingTo;
+    private List<String> pendingToList;
 
     private IncidentStatus status;
 
@@ -60,11 +60,11 @@ public class IncidentFilterRequest {
         }
     }
 
-    public void setPendingTo(String value) {
-        if (value == null || value.equalsIgnoreCase("null") || value.isBlank()) {
-            this.pendingTo = null;
-        }  else {
-            this.pendingTo = value;
+    public void setPendingToList(List<String> value) {
+        if (value == null || value.isEmpty()) {
+            this.pendingToList = List.of();
+        } else {
+            this.pendingToList = value;
         }
     }
 

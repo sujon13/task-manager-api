@@ -61,7 +61,19 @@ public class UserUtil {
     }
 
     public boolean isSupervisor() {
-        return hasAnyRole(Constants.SCADA_SE, Constants.SMD_XEN);
+        return hasAnyRole(Constants.SCADA_SE, Constants.SMD_XEN, Constants.CNST_XEN);
+    }
+
+    public boolean isSeScada() {
+        return hasAnyRole(Constants.SCADA_SE);
+    }
+
+    public boolean isSmdXen() {
+        return hasAnyRole(Constants.SMD_XEN);
+    }
+
+    public boolean isCnstXen() {
+        return hasAnyRole(Constants.CNST_XEN);
     }
 
     public boolean isUser() {

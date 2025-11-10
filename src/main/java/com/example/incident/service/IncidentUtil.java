@@ -6,6 +6,8 @@ import com.example.incident.enums.IncidentStatus;
 import com.example.incident.enums.Priority;
 import com.example.incident.model.CustomDropdown;
 import com.example.incident.model.Incident;
+import com.example.incident.model.IncidentResponse;
+import com.example.util.Constants;
 import com.example.util.UserUtil;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -54,6 +56,11 @@ public class IncidentUtil {
 
     public boolean isAssigneeOrAdmin(Incident incident) {
         return isAssigneeOrAdmin(incident, userUtil.getUserName());
+    }
+
+    public boolean isPendingToSuperVisor(IncidentResponse incidentResponse) {
+        final String pendingTo = incidentResponse.getPendingTo().getUserName();
+        return List.of(Constants.SMD_XEN_USER_NAME, Constants.CNST_XEN_USER_NAME).contains(pendingTo);
     }
 
     public void checkEditPermission(Incident incident) {

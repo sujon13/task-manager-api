@@ -175,12 +175,26 @@ public class IncidentService {
         );
     }
 
-    private String choosePendingTo(Incident incident) {
-        return switch (incident.getStatus()) {
-            case REPORTED, COMPLETED, RETURNED -> Constants.SMD_XEN_USER_NAME;
-            case IN_PROGRESS -> incident.getAssignedTo();
-            default -> null;
-        };
+    private List<IncidentResponse> makeSorted(List<IncidentResponse> incidentResponses) {
+        final String me = userUtil.getUserName();
+        final boolean isSupervisor = userUtil.isSupervisor();
+        final boolean isSeScada = userUtil.isSeScada();
+        final boolean isSmdXen = userUtil.isSmdXen();
+        final boolean isCnstXen = userUtil.isCnstXen();
+        return incidentResponses.stream()
+                .sorted(Comparator.comparing(response -> {
+                    if (response.getPendingTo() == null) {
+                        return true;
+                    } else if (isSupervisor) {
+                        if (isSeScada && incidentUtil.isPendingToSuperVisor(response)) return false;
+                        if (isSmdXen && Constants.SMD_XEN_USER_NAME.equals(response.getPendingTo().getUserName())) return false;
+                        if (isCnstXen && Constants.CNST_XEN_USER_NAME.equals(response.getPendingTo().getUserName())) return false;
+                        return true;
+                    } else {
+                        return !me.equals(response.getPendingTo().getUserName());
+                    }
+                }))
+                .toList();
     }
 
     private Page<IncidentResponse> buildIncidentResponses(Page<Incident> incidents) {
@@ -190,7 +204,6 @@ public class IncidentService {
         Map<String, UserResponse> userNameToUserResponseMap = getUserNameToResponseMap(incidents.toList());
 
         final String me = userUtil.getUserName();
-        final boolean isSupervisor = userUtil.isSupervisor();
         List<IncidentResponse> incidentResponses = incidents.stream()
                 .map(incident -> buildIncidentResponse(
                         incident,
@@ -199,22 +212,13 @@ public class IncidentService {
                         userNameToUserResponseMap)
                 )
                 .peek(incidentResponse -> checkAndSetIfLoggedInUserIsReporterOrAssignee(incidentResponse, me))
-                .sorted(Comparator.comparing(response -> {
-                    if (response.getPendingTo() == null) {
-                        return true;
-                    } else if (isSupervisor) {
-                        return !Constants.SMD_XEN_USER_NAME.equals(response.getPendingTo().getUserName());
-                    } else {
-                        return !me.equals(response.getPendingTo().getUserName());
-                    }
-                }))
                 .toList();
-        return new PageImpl<>(incidentResponses, incidents.getPageable(), incidents.getTotalElements());
+        return new PageImpl<>(makeSorted(incidentResponses), incidents.getPageable(), incidents.getTotalElements());
     }
 
     public Page<IncidentResponse> getIncidents(IncidentFilterRequest request, Pageable pageable) {
-        if (userUtil.isSupervisor() && Constants.SCADA_SE_USER_NAME.equals(request.getPendingTo())) {
-            request.setPendingTo(Constants.SMD_XEN_USER_NAME);
+        if (request.getPendingToList().contains(Constants.SCADA_SE_USER_NAME)) {
+            request.setPendingToList(List.of(Constants.SMD_XEN_USER_NAME, Constants.CNST_XEN_USER_NAME));
         }
         Specification<Incident> incidentSpecification = IncidentSpecification.buildSpecification(request);
         Page<Incident> incidents = incidentRepository.findAll(incidentSpecification, pageable);
